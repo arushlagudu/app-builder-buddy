@@ -4,7 +4,6 @@ import { SkinForm } from '@/components/skin/SkinForm';
 import { ImageCapture } from '@/components/skin/ImageCapture';
 import { AnalysisResults } from '@/components/skin/AnalysisResults';
 import { BottomNav } from '@/components/skin/BottomNav';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface SkinFormData {
@@ -58,26 +57,42 @@ export default function Index() {
     setShowValidationWarning(false);
 
     try {
-      const { data, error } = await supabase.functions.invoke('analyze-skin', {
-        body: {
+      // Use direct fetch with timeout for better error handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+      
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-skin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({
           image: imageData,
           skinType: formData?.skinType,
           concerns: formData?.concerns,
           climate: formData?.climate,
           pollution: formData?.pollution,
-        },
+        }),
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
 
-      if (error) {
-        if (error.message?.includes('429')) {
+      if (!response.ok) {
+        if (response.status === 429) {
           toast.error('Rate limit exceeded. Please try again in a moment.');
-        } else if (error.message?.includes('402')) {
+          return;
+        } else if (response.status === 402) {
           toast.error('AI credits exhausted. Please add credits to continue.');
-        } else {
-          throw error;
+          return;
         }
-        return;
+        const errorText = await response.text();
+        throw new Error(`Server error: ${response.status} - ${errorText}`);
       }
+
+      const data = await response.json();
 
       setAnalysisResults(data);
       toast.success('Analysis complete!');
