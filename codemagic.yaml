@@ -3,12 +3,12 @@ workflows:
     name: iOS Capacitor Build
     max_build_duration: 60
     instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Codemagic
     environment:
       node: 18
       xcode: latest
       cocoapods: default
-      groups:
-        - app_store_credentials
       vars:
         BUNDLE_ID: "app.lovable.c41f13761aba463197917f33c1ad45b0"
     scripts:
