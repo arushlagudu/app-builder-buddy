@@ -65,6 +65,36 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_tips: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean
+          tip_type: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          tip_type: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          tip_type?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -84,6 +114,113 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      progress_photos: {
+        Row: {
+          analysis_id: string | null
+          created_at: string
+          id: string
+          image_url: string
+          notes: string | null
+          skin_score: number | null
+          user_id: string
+        }
+        Insert: {
+          analysis_id?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          notes?: string | null
+          skin_score?: number | null
+          user_id: string
+        }
+        Update: {
+          analysis_id?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          notes?: string | null
+          skin_score?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progress_photos_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_history"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scanned_products: {
+        Row: {
+          brand: string | null
+          compatibility_score: number | null
+          conflicts: Json | null
+          created_at: string
+          id: string
+          image_url: string | null
+          ingredients: string[] | null
+          product_name: string | null
+          recommendations: Json | null
+          user_id: string
+        }
+        Insert: {
+          brand?: string | null
+          compatibility_score?: number | null
+          conflicts?: Json | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          ingredients?: string[] | null
+          product_name?: string | null
+          recommendations?: Json | null
+          user_id: string
+        }
+        Update: {
+          brand?: string | null
+          compatibility_score?: number | null
+          conflicts?: Json | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          ingredients?: string[] | null
+          product_name?: string | null
+          recommendations?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          scans_reset_at: string
+          scans_used: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          scans_reset_at?: string
+          scans_used?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          scans_reset_at?: string
+          scans_used?: number
+          status?: string
           updated_at?: string
           user_id?: string
         }
