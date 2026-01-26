@@ -5,86 +5,83 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const systemPrompt = `You are a Senior Cosmetic Chemist and Board-Certified Dermatologist with 20+ years of clinical experience. You specialize in skin physiology, cosmetic chemistry, and evidence-based skincare formulation.
+const systemPrompt = `You are a Senior Cosmetic Chemist and Board-Certified Dermatologist. Analyze skin images and provide clinical assessments.
 
-When analyzing a user's skin, you MUST provide:
+When analyzing a user's skin, provide:
 
-1. CORE PROBLEM IDENTIFICATION: Diagnose the 3 most likely physiological causes of the user's concerns. Be specific about the biological mechanisms.
+1. CORE PROBLEMS: Diagnose 3 physiological causes with biological mechanisms.
 
-2. SKIN HEALTH SCORE (1-10): Assign a precise score. Deduct points for:
-   - High inflammation indicators (-1 to -2)
-   - Compromised barrier signals (-1 to -2)
-   - Severe dehydration signs (-1)
-   - Active breakouts or lesions (-1)
-   - Hyperpigmentation severity (-0.5 to -1)
+2. SKIN HEALTH SCORE (1-10): Deduct points for inflammation, barrier damage, dehydration, breakouts, hyperpigmentation.
 
-3. DEEP ANALYSIS: Explain the "Why" using precise biological terms:
-   - Transepidermal Water Loss (TEWL)
-   - Sebum oxidation and lipid peroxidation
-   - Glycation and AGE formation
-   - Melanin dysregulation
-   - Collagen degradation pathways
-   - Microbiome imbalance
+3. DEEP ANALYSIS: Explain using terms like TEWL, sebum oxidation, glycation, melanin dysregulation.
 
 4. INGREDIENT FILTERING:
-   - AVOID LIST: Specific surfactants, alcohols, fragrances, and irritants that trigger the user's specific skin profile
-   - PRESCRIPTION LIST: Active chemicals with scientific backing (Azelaic Acid, Ceramides, Copper Peptides, Retinoids, etc.) with explanations of mechanism of action
+   - AVOID: Surfactants, alcohols, fragrances that trigger the user's skin
+   - PRESCRIPTION: Active chemicals with mechanisms
 
-5. ROUTINE CONSTRUCTION:
-   - Create specific AM/PM routines
-   - Ensure pH-dependent products are correctly ordered (Vitamin C before AHAs, etc.)
-   - Include REAL product recommendations with brand names
-   - Explain the chemical rationale for each step placement
+5. ROUTINE: AM/PM with pH-correct ordering and real product recommendations.
 
-CRITICAL: Respond ONLY with valid JSON matching this exact structure:
+Respond ONLY with valid JSON:
 {
   "score": 7.5,
   "problems": [
     {"title": "Problem Name", "description": "Clinical explanation", "icon": "hydration|inflammation|barrier"}
   ],
-  "deepAnalysis": "Detailed biological explanation...",
-  "avoidIngredients": [
-    {"name": "Ingredient", "reason": "Why to avoid"}
-  ],
-  "prescriptionIngredients": [
-    {"name": "Ingredient", "reason": "Mechanism of action and benefit"}
-  ],
-  "routine": [
-    {"time": "AM|PM|BOTH", "step": 1, "product": "Product Name by Brand", "productLink": "https://...", "reason": "Chemical rationale"}
-  ]
+  "deepAnalysis": "Biological explanation...",
+  "avoidIngredients": [{"name": "Ingredient", "reason": "Why to avoid"}],
+  "prescriptionIngredients": [{"name": "Ingredient", "reason": "Mechanism"}],
+  "routine": [{"time": "AM|PM|BOTH", "step": 1, "product": "Product by Brand", "reason": "Rationale"}]
 }`;
 
 serve(async (req) => {
+  console.log("analyze-skin function called");
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { image, skinType, concerns, climate, pollution } = await req.json();
+    const body = await req.json();
+    const { image, skinType, concerns, climate, pollution } = body;
+    
+    console.log("Received request with skinType:", skinType, "concerns:", concerns);
+    
+    if (!image) {
+      console.error("No image provided");
+      return new Response(
+        JSON.stringify({ error: "No image provided" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Check image size (rough estimate from base64)
+    const imageSizeKB = Math.round((image.length * 3) / 4 / 1024);
+    console.log("Image size approx:", imageSizeKB, "KB");
+    
+    if (imageSizeKB > 4000) {
+      console.error("Image too large:", imageSizeKB, "KB");
+      return new Response(
+        JSON.stringify({ error: "Image too large. Please use a smaller image." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const userPrompt = `Analyze this skin image and provide a comprehensive dermatological assessment.
+    const userPrompt = `Analyze this skin image:
+- Skin Type: ${skinType || 'unknown'}
+- Concerns: ${concerns?.join(", ") || 'general'}
+- Climate: ${climate || 'temperate'}
+- Pollution: ${pollution || 'moderate'}
 
-User Profile:
-- Skin Type: ${skinType}
-- Primary Concerns: ${concerns?.join(", ")}
-- Climate: ${climate}
-- Pollution Level: ${pollution}
+Provide health score, 3 core problems, deep analysis, avoid/prescription ingredients, and AM/PM routine with real products. Return ONLY valid JSON.`;
 
-Based on the image and profile, provide:
-1. A health score from 1-10
-2. The 3 most likely physiological problems
-3. Deep biological analysis
-4. Ingredients to avoid (with reasons)
-5. Prescription ingredients (with mechanisms)
-6. Complete AM/PM routine with real product recommendations
-
-Return ONLY valid JSON.`;
-
+    console.log("Calling AI gateway...");
+    
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -92,7 +89,7 @@ Return ONLY valid JSON.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           {
@@ -106,9 +103,11 @@ Return ONLY valid JSON.`;
             ],
           },
         ],
-        max_tokens: 4096,
+        max_tokens: 3000,
       }),
     });
+
+    console.log("AI gateway response status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -116,24 +115,27 @@ Return ONLY valid JSON.`;
       
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: "Payment required. Please add credits." }),
+          JSON.stringify({ error: "AI credits exhausted. Please add credits." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       
-      throw new Error(`AI gateway error: ${response.status}`);
+      throw new Error(`AI gateway error: ${response.status} - ${errorText}`);
     }
 
     const aiResponse = await response.json();
+    console.log("AI response received");
+    
     const content = aiResponse.choices?.[0]?.message?.content;
 
     if (!content) {
+      console.error("No content in AI response:", JSON.stringify(aiResponse));
       throw new Error("No content in AI response");
     }
 
@@ -143,9 +145,10 @@ Return ONLY valid JSON.`;
       const jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/) || content.match(/\{[\s\S]*\}/);
       const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
       analysisData = JSON.parse(jsonStr);
+      console.log("Successfully parsed analysis data");
     } catch (parseError) {
-      console.error("JSON parse error:", parseError, "Content:", content);
-      throw new Error("Failed to parse AI response");
+      console.error("JSON parse error:", parseError, "Content:", content.substring(0, 500));
+      throw new Error("Failed to parse AI response as JSON");
     }
 
     return new Response(JSON.stringify(analysisData), {
@@ -154,7 +157,7 @@ Return ONLY valid JSON.`;
   } catch (error) {
     console.error("analyze-skin error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error occurred" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
