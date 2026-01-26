@@ -30,6 +30,7 @@ const steps = [
     title: 'Welcome to Dermatological Intelligence',
     subtitle: 'Your AI-Powered Skin Analysis Companion',
     description: 'Get clinical-grade skin analysis and personalized skincare routines powered by advanced AI. Let\'s get you started!',
+    note: '💡 You can replay this tutorial anytime from Settings',
     icon: Sparkles,
     features: [
       { icon: Shield, label: 'Science-backed analysis' },
@@ -147,9 +148,16 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
           </DialogDescription>
 
           {/* Description */}
-          <p className="text-muted-foreground text-center text-sm mb-6">
+          <p className="text-muted-foreground text-center text-sm mb-4">
             {step.description}
           </p>
+
+          {/* Note (for welcome step) */}
+          {'note' in step && step.note && (
+            <p className="text-xs text-center text-primary/80 bg-primary/10 rounded-lg px-3 py-2 mb-4">
+              {step.note}
+            </p>
+          )}
 
           {/* Features or Steps */}
           {step.features && (
