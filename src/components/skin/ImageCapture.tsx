@@ -8,9 +8,51 @@ interface ImageCaptureProps {
   onDismissWarning: () => void;
 }
 
+// Compress and resize image to reduce payload size
+const compressImage = (file: File | Blob, maxWidth = 800, quality = 0.7): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+      
+      // Scale down if needed
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+      
+      ctx.drawImage(img, 0, 0, width, height);
+      const compressedData = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressedData);
+    };
+    
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Failed to load image'));
+    };
+    
+    img.src = url;
+  });
+};
+
 export function ImageCapture({ onImageCapture, isScanning, showValidationWarning, onDismissWarning }: ImageCaptureProps) {
   const [image, setImage] = useState<string | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -19,7 +61,7 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }
+        video: { facingMode: 'user', width: { ideal: 800 }, height: { ideal: 600 } }
       });
       streamRef.current = stream;
       if (videoRef.current) {
@@ -37,12 +79,24 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      
+      // Limit canvas size
+      const maxWidth = 800;
+      let width = video.videoWidth;
+      let height = video.videoHeight;
+      
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.drawImage(video, 0, 0);
-        const imageData = canvas.toDataURL('image/jpeg', 0.9);
+        ctx.drawImage(video, 0, 0, width, height);
+        const imageData = canvas.toDataURL('image/jpeg', 0.7);
         setImage(imageData);
         onImageCapture(imageData);
         stopCamera();
@@ -58,16 +112,27 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
     setIsCameraActive(false);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageData = reader.result as string;
-        setImage(imageData);
-        onImageCapture(imageData);
-      };
-      reader.readAsDataURL(file);
+      setIsCompressing(true);
+      try {
+        const compressedImage = await compressImage(file, 800, 0.7);
+        setImage(compressedImage);
+        onImageCapture(compressedImage);
+      } catch (err) {
+        console.error('Failed to compress image:', err);
+        // Fallback to direct read but still limit size
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const imageData = reader.result as string;
+          setImage(imageData);
+          onImageCapture(imageData);
+        };
+        reader.readAsDataURL(file);
+      } finally {
+        setIsCompressing(false);
+      }
     }
   };
 
@@ -98,7 +163,12 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
       <div className="glass-card overflow-hidden">
         {/* Image/Camera Preview Area */}
         <div className="relative aspect-[3/4] bg-obsidian-light flex items-center justify-center overflow-hidden rounded-t-2xl">
-          {isCameraActive ? (
+          {isCompressing ? (
+            <div className="text-center p-6">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+              <p className="text-muted-foreground text-sm">Processing image...</p>
+            </div>
+          ) : isCameraActive ? (
             <>
               <video
                 ref={videoRef}
@@ -193,7 +263,7 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
         </div>
 
         {/* Action buttons */}
-        {!isCameraActive && !image && (
+        {!isCameraActive && !image && !isCompressing && (
           <div className="p-4 flex gap-3">
             <button
               onClick={startCamera}
