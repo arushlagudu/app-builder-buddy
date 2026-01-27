@@ -1,4 +1,4 @@
-import { Scan, Package, Bot, ListChecks, Flame, TrendingUp, Dna } from 'lucide-react';
+import { Scan, Package, Bot, ListChecks, TrendingUp, Dna, Settings } from 'lucide-react';
 
 type Tab = 'scan' | 'history' | 'progress' | 'scanner' | 'skyn' | 'coach' | 'routines' | 'streaks' | 'settings';
 
@@ -15,9 +15,10 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
     { id: 'skyn' as Tab, icon: Dna, label: 'SKYN' },
     { id: 'coach' as Tab, icon: Bot, label: 'AI Coach' },
     { id: 'progress' as Tab, icon: TrendingUp, label: 'Progress Analytics' },
+    { id: 'settings' as Tab, icon: Settings, label: 'Settings' },
   ];
 
-  // Split tabs into left, center (SKYN), and right groups
+  // Split tabs into left, center (SKYN), and right groups (3-1-3 for balance)
   const leftTabs = tabs.slice(0, 3);
   const centerTab = tabs[3]; // SKYN
   const rightTabs = tabs.slice(4);
