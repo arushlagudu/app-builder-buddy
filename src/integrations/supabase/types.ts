@@ -208,6 +208,30 @@ export type Database = {
           },
         ]
       }
+      routine_streaks: {
+        Row: {
+          completed_at: string
+          created_at: string
+          id: string
+          routine_type: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          routine_type: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          routine_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scanned_products: {
         Row: {
           brand: string | null
@@ -272,6 +296,36 @@ export type Database = {
           scans_reset_at?: string
           scans_used?: number
           status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_streak_stats: {
+        Row: {
+          current_streak: number
+          id: string
+          last_completion_date: string | null
+          longest_streak: number
+          total_completions: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_streak?: number
+          id?: string
+          last_completion_date?: string | null
+          longest_streak?: number
+          total_completions?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_streak?: number
+          id?: string
+          last_completion_date?: string | null
+          longest_streak?: number
+          total_completions?: number
           updated_at?: string
           user_id?: string
         }
