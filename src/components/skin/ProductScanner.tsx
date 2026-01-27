@@ -16,6 +16,10 @@ interface ScanResult {
 interface ProductScannerProps {
   skinType?: string;
   concerns?: string[];
+  score?: number | null;
+  problems?: { title: string; description: string }[] | null;
+  avoidIngredients?: { name: string; reason: string }[] | null;
+  prescriptionIngredients?: { name: string; reason: string }[] | null;
 }
 
 // Check image clarity by analyzing variance in pixel brightness
@@ -61,7 +65,7 @@ const checkImageClarity = (imageData: string): Promise<{ isBlurry: boolean; scor
   });
 };
 
-export function ProductScanner({ skinType, concerns }: ProductScannerProps) {
+export function ProductScanner({ skinType, concerns, score, problems, avoidIngredients, prescriptionIngredients }: ProductScannerProps) {
   const { user } = useAuth();
   const [image, setImage] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -127,6 +131,10 @@ export function ProductScanner({ skinType, concerns }: ProductScannerProps) {
           image,
           skinType: skinType || 'normal',
           concerns: concerns || [],
+          score: score,
+          problems: problems || [],
+          avoidIngredients: avoidIngredients || [],
+          prescriptionIngredients: prescriptionIngredients || [],
         }),
       });
 

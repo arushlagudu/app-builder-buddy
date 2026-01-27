@@ -5,19 +5,29 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const systemPrompt = `You are an AI skin coach providing personalized daily skincare tips. Generate 3 tips:
+const systemPrompt = `You are an AI skin coach providing HIGHLY PERSONALIZED daily skincare tips. You have access to the user's complete dermatological profile including:
+- Their skin type and specific concerns
+- Their latest skin health score and identified problems
+- Ingredients they should avoid
+- Ingredients that are recommended for them
+- Their environmental conditions
 
-1. A routine tip (about applying products, timing, technique)
-2. A weather/environmental tip (based on climate)
-3. A general wellness tip (diet, sleep, hydration)
+Generate 3 tips that are DIRECTLY RELEVANT to their specific situation:
 
-Make tips specific, actionable, and based on the user's skin profile.
+1. A routine tip (about their specific routine, timing, technique - reference their actual skin problems)
+2. An environmental tip (based on their climate and how it affects their specific skin issues)
+3. A wellness/lifestyle tip (diet, sleep, hydration - targeted to their concerns)
+
+CRITICAL: Each tip MUST reference their actual skin data. Don't give generic advice. For example:
+- If they have dehydration issues, mention specific hydration strategies
+- If they should avoid certain ingredients, remind them
+- If they have a low score in certain areas, address those specifically
 
 Respond ONLY with valid JSON array:
 [
-  {"type": "routine", "title": "Short Title", "content": "Detailed tip content"},
-  {"type": "weather", "title": "Short Title", "content": "Detailed tip content"},
-  {"type": "general", "title": "Short Title", "content": "Detailed tip content"}
+  {"type": "routine", "title": "Short Title", "content": "Personalized tip referencing their specific issues"},
+  {"type": "weather", "title": "Short Title", "content": "Environmental tip for their climate and skin type"},
+  {"type": "general", "title": "Short Title", "content": "Lifestyle tip targeting their concerns"}
 ]`;
 
 serve(async (req) => {
@@ -26,21 +36,55 @@ serve(async (req) => {
   }
 
   try {
-    const { skinType, concerns, climate } = await req.json();
+    const { 
+      skinType, 
+      concerns, 
+      climate,
+      score,
+      problems,
+      avoidIngredients,
+      prescriptionIngredients
+    } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const userPrompt = `Generate 3 personalized skincare tips for today.
-User profile:
+    // Build rich context from user's skin analysis
+    const problemsList = problems?.map((p: { title: string; description: string }) => 
+      `- ${p.title}: ${p.description}`
+    ).join('\n') || 'No specific problems identified';
+    
+    const avoidList = avoidIngredients?.map((i: { name: string }) => i.name).join(', ') || 'None specified';
+    const recommendedList = prescriptionIngredients?.map((i: { name: string }) => i.name).join(', ') || 'None specified';
+
+    const userPrompt = `Generate 3 HIGHLY PERSONALIZED skincare tips for today based on this user's profile:
+
+SKIN PROFILE:
 - Skin Type: ${skinType || 'normal'}
 - Concerns: ${concerns?.join(", ") || "general maintenance"}
 - Climate: ${climate || 'temperate'}
-- Current date: ${new Date().toLocaleDateString()}
+- Current Skin Score: ${score || 'not assessed'}/10
+- Current Date: ${new Date().toLocaleDateString()}
 
-Make tips specific and actionable. Return ONLY valid JSON array.`;
+IDENTIFIED SKIN PROBLEMS (from their latest analysis):
+${problemsList}
+
+INGREDIENTS TO AVOID:
+${avoidList}
+
+RECOMMENDED INGREDIENTS:
+${recommendedList}
+
+IMPORTANT: Make each tip SPECIFIC to their profile. Reference their actual problems, score, and concerns. Don't give generic advice - make it personal.
+
+For example:
+- If their score is low (below 6), be encouraging and focus on foundational improvements
+- If they have specific problems like dehydration or inflammation, address those directly
+- If they should avoid certain ingredients, remind them to check product labels
+
+Return ONLY valid JSON array.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -54,11 +98,23 @@ Make tips specific and actionable. Return ONLY valid JSON array.`;
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        max_tokens: 1000,
+        max_tokens: 1500,
       }),
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limits exceeded, please try again later." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "Payment required, please add funds." }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const errorText = await response.text();
       throw new Error(`AI gateway error: ${response.status} - ${errorText}`);
     }
