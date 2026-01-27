@@ -17,9 +17,13 @@ interface AISkinCoachProps {
   skinType?: string;
   concerns?: string[];
   climate?: string;
+  score?: number | null;
+  problems?: { title: string; description: string }[] | null;
+  avoidIngredients?: { name: string; reason: string }[] | null;
+  prescriptionIngredients?: { name: string; reason: string }[] | null;
 }
 
-export function AISkinCoach({ skinType, concerns, climate }: AISkinCoachProps) {
+export function AISkinCoach({ skinType, concerns, climate, score, problems, avoidIngredients, prescriptionIngredients }: AISkinCoachProps) {
   const { user } = useAuth();
   const [tips, setTips] = useState<DailyTip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,6 +80,10 @@ export function AISkinCoach({ skinType, concerns, climate }: AISkinCoachProps) {
           skinType: skinType || 'normal',
           concerns: concerns || [],
           climate: climate || 'temperate',
+          score: score,
+          problems: problems || [],
+          avoidIngredients: avoidIngredients || [],
+          prescriptionIngredients: prescriptionIngredients || [],
         }),
       });
 
