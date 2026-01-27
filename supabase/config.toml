@@ -2,3 +2,12 @@ project_id = "siavlvrqzrxewbdlznmc"
 
 [functions.analyze-skin]
 verify_jwt = false
+
+[functions.analyze-product]
+verify_jwt = false
+
+[functions.generate-tips]
+verify_jwt = false
+
+[functions.generate-routine]
+verify_jwt = false

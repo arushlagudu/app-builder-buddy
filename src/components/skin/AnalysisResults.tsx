@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink } from 'lucide-react';
+import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink, Sparkles } from 'lucide-react';
 import { ScoreGauge } from './ScoreGauge';
+import { RoutineGenerator } from './RoutineGenerator';
 
 interface Problem {
   title: string;
@@ -32,6 +33,10 @@ interface AnalysisData {
 
 interface AnalysisResultsProps {
   data: AnalysisData;
+  skinType?: string;
+  concerns?: string[];
+  climate?: string;
+  pollution?: string;
   onDownloadReport: () => void;
 }
 
@@ -41,9 +46,10 @@ const iconMap = {
   barrier: Zap,
 };
 
-export function AnalysisResults({ data, onDownloadReport }: AnalysisResultsProps) {
+export function AnalysisResults({ data, skinType, concerns, climate, pollution, onDownloadReport }: AnalysisResultsProps) {
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showRoutineGenerator, setShowRoutineGenerator] = useState(false);
 
   const amRoutine = data.routine.filter(s => s.time === 'AM' || s.time === 'BOTH');
   const pmRoutine = data.routine.filter(s => s.time === 'PM' || s.time === 'BOTH');
@@ -216,6 +222,28 @@ export function AnalysisResults({ data, onDownloadReport }: AnalysisResultsProps
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Make Routine Section */}
+      <div className="space-y-4">
+        {!showRoutineGenerator ? (
+          <button
+            onClick={() => setShowRoutineGenerator(true)}
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <Sparkles className="w-5 h-5" />
+            Make My Personalized Routine
+          </button>
+        ) : (
+          <RoutineGenerator
+            skinType={skinType || 'combination'}
+            concerns={concerns || []}
+            problems={data.problems}
+            score={data.score}
+            climate={climate || 'temperate'}
+            pollution={pollution || 'moderate'}
+          />
+        )}
       </div>
 
       {/* Download Report Button */}
