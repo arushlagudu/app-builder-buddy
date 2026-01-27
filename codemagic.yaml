@@ -18,13 +18,16 @@ workflows:
           npm run build
       - name: Add iOS platform
         script: |
-          npx cap add ios || true
+          npx cap add ios
+      - name: Update iOS platform
+        script: |
+          npx cap update ios
       - name: Sync Capacitor
         script: |
           npx cap sync ios
       - name: Install CocoaPods
         script: |
-          cd ios/App && pod install
+          cd ios/App && pod install --repo-update
       - name: Build iOS app
         script: |
           cd ios/App
