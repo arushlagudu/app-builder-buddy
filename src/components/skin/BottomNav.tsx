@@ -45,27 +45,21 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             ))}
           </div>
 
-          {/* Center SKYN tab - elevated and prominent */}
+          {/* Center SKYN tab - subtle prominence */}
           <button
             onClick={() => onTabChange(centerTab.id)}
-            className={`relative flex flex-col items-center gap-1 px-5 py-2 -mt-3 rounded-2xl transition-all duration-300 ${
+            className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-300 ${
               activeTab === centerTab.id
-                ? 'text-secondary bg-gradient-to-br from-secondary/20 to-primary/10 shadow-[0_0_20px_rgba(112,0,255,0.4)]'
-                : 'text-muted-foreground hover:text-secondary bg-background/50 hover:bg-secondary/10'
+                ? 'text-secondary bg-secondary/15 shadow-[0_0_12px_rgba(112,0,255,0.3)]'
+                : 'text-muted-foreground hover:text-secondary hover:bg-secondary/10'
             }`}
           >
-            {/* Glow ring behind icon */}
-            <div className={`absolute top-1 w-10 h-10 rounded-full transition-all duration-300 ${
+            <centerTab.icon className={`w-6 h-6 transition-transform duration-300 ${
               activeTab === centerTab.id 
-                ? 'bg-secondary/20 blur-md animate-pulse' 
+                ? 'text-glow-purple' 
                 : ''
             }`} />
-            <centerTab.icon className={`relative w-7 h-7 transition-transform duration-300 ${
-              activeTab === centerTab.id 
-                ? 'text-glow-purple scale-110' 
-                : ''
-            }`} />
-            <span className={`text-[10px] font-bold tracking-wide ${
+            <span className={`text-[10px] font-semibold ${
               activeTab === centerTab.id ? 'text-secondary' : ''
             }`}>
               {centerTab.label}
