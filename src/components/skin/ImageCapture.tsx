@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
-import { Camera, Upload, X, Scan, AlertCircle } from 'lucide-react';
+import { Camera, Upload, X, Scan, AlertCircle, Info, RefreshCw } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface ImageCaptureProps {
   onImageCapture: (imageData: string) => void;
@@ -7,6 +8,52 @@ interface ImageCaptureProps {
   showValidationWarning: boolean;
   onDismissWarning: () => void;
 }
+
+// Check image clarity by analyzing variance in pixel brightness
+const checkImageClarity = (imageData: string): Promise<{ isBlurry: boolean; score: number }> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const size = 100; // Sample size for analysis
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        resolve({ isBlurry: false, score: 100 });
+        return;
+      }
+      
+      ctx.drawImage(img, 0, 0, size, size);
+      const imageDataObj = ctx.getImageData(0, 0, size, size);
+      const data = imageDataObj.data;
+      
+      // Calculate Laplacian variance (simple blur detection)
+      let sum = 0;
+      let sumSquares = 0;
+      let count = 0;
+      
+      for (let i = 0; i < data.length; i += 4) {
+        const gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        sum += gray;
+        sumSquares += gray * gray;
+        count++;
+      }
+      
+      const mean = sum / count;
+      const variance = (sumSquares / count) - (mean * mean);
+      
+      // Threshold for blur detection (lower variance = more blur)
+      const isBlurry = variance < 800;
+      const score = Math.min(100, Math.round(variance / 20));
+      
+      resolve({ isBlurry, score });
+    };
+    img.onerror = () => resolve({ isBlurry: false, score: 100 });
+    img.src = imageData;
+  });
+};
 
 // Compress and resize image to reduce payload size
 const compressImage = (file: File | Blob, maxWidth = 800, quality = 0.7): Promise<string> => {
@@ -53,10 +100,41 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
   const [image, setImage] = useState<string | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
+  const [showBlurWarning, setShowBlurWarning] = useState(false);
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+
+  const processImage = async (imageData: string) => {
+    const { isBlurry } = await checkImageClarity(imageData);
+    
+    if (isBlurry) {
+      setPendingImage(imageData);
+      setShowBlurWarning(true);
+    } else {
+      setImage(imageData);
+      onImageCapture(imageData);
+      setShowBlurWarning(false);
+      setPendingImage(null);
+    }
+  };
+
+  const handleUseAnyway = () => {
+    if (pendingImage) {
+      setImage(pendingImage);
+      onImageCapture(pendingImage);
+    }
+    setShowBlurWarning(false);
+    setPendingImage(null);
+  };
+
+  const handleRetake = () => {
+    setShowBlurWarning(false);
+    setPendingImage(null);
+    setImage(null);
+  };
 
   const startCamera = async () => {
     try {
@@ -75,7 +153,7 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
     }
   };
 
-  const capturePhoto = useCallback(() => {
+  const capturePhoto = useCallback(async () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
@@ -97,9 +175,8 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
       if (ctx) {
         ctx.drawImage(video, 0, 0, width, height);
         const imageData = canvas.toDataURL('image/jpeg', 0.7);
-        setImage(imageData);
-        onImageCapture(imageData);
         stopCamera();
+        await processImage(imageData);
       }
     }
   }, [onImageCapture]);
@@ -118,16 +195,14 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
       setIsCompressing(true);
       try {
         const compressedImage = await compressImage(file, 800, 0.7);
-        setImage(compressedImage);
-        onImageCapture(compressedImage);
+        await processImage(compressedImage);
       } catch (err) {
         console.error('Failed to compress image:', err);
         // Fallback to direct read but still limit size
         const reader = new FileReader();
-        reader.onloadend = () => {
+        reader.onloadend = async () => {
           const imageData = reader.result as string;
-          setImage(imageData);
-          onImageCapture(imageData);
+          await processImage(imageData);
         };
         reader.readAsDataURL(file);
       } finally {
@@ -142,20 +217,64 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
   };
 
   return (
-    <div className="relative">
+    <div className="relative space-y-3">
+      {/* Instructions */}
+      <div className="glass-card p-3 bg-primary/5 border-primary/20">
+        <div className="flex items-start gap-2">
+          <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p className="font-medium text-foreground">How to get the best results:</p>
+            <ul className="list-disc list-inside space-y-0.5">
+              <li>Use natural lighting (avoid harsh shadows)</li>
+              <li>Face the camera directly, keep your face centered</li>
+              <li>Remove makeup for accurate skin analysis</li>
+              <li>Hold steady to avoid blurry photos</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Blur Warning Modal */}
+      {showBlurWarning && (
+        <div className="glass-card p-4 bg-yellow-500/10 border-yellow-500/30 animate-fade-in">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-yellow-400 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <p className="font-medium text-yellow-400 text-sm">Image may be blurry</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                The photo appears unclear. For best results, please retake with better lighting and hold steady.
+              </p>
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={handleRetake}
+                  className="flex-1 py-2 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center gap-1.5"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Retake Photo
+                </button>
+                <button
+                  onClick={handleUseAnyway}
+                  className="flex-1 py-2 px-3 rounded-lg bg-muted text-foreground text-xs font-medium"
+                >
+                  Use Anyway
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Validation Warning */}
       {showValidationWarning && (
-        <div className="absolute -top-16 left-0 right-0 z-20 animate-fade-in">
-          <div className="glass-card bg-destructive/20 border-destructive/50 p-3 mx-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-destructive" />
-                <p className="text-sm text-destructive">Please complete the form above first</p>
-              </div>
-              <button onClick={onDismissWarning} className="text-destructive/70 hover:text-destructive">
-                <X className="w-4 h-4" />
-              </button>
+        <div className="glass-card bg-destructive/20 border-destructive/50 p-3 animate-fade-in">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-destructive" />
+              <p className="text-sm text-destructive">Please complete the form above first</p>
             </div>
+            <button onClick={onDismissWarning} className="text-destructive/70 hover:text-destructive">
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
