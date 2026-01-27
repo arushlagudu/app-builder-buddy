@@ -209,41 +209,6 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'scan_limit' }:
           </div>
         </div>
 
-        {/* Social Proof */}
-        <div className="px-6 pb-6">
-          <div className="glass-card p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex -space-x-2">
-                {[...Array(4)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/50 to-secondary/50 border-2 border-background flex items-center justify-center text-xs font-bold"
-                  >
-                    {['S', 'J', 'E', 'M'][i]}
-                  </div>
-                ))}
-              </div>
-              <span className="text-xs text-muted-foreground">
-                <strong className="text-foreground">2,847+</strong> people upgraded this week
-              </span>
-            </div>
-            
-            <div className="space-y-2">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div className="flex">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-3 h-3 fill-primary text-primary" />
-                    ))}
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    <strong className="text-foreground">{testimonial.name}</strong> — "{testimonial.result}"
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
 
         {/* CTA Section */}
         <div className="sticky bottom-0 px-6 py-6 bg-gradient-to-t from-background via-background to-transparent">
