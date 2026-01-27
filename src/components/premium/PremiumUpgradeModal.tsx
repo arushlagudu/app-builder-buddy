@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { X, Check, Sparkles, TrendingUp, Shield, Zap, Crown, Star, Clock, Camera, Bot, BarChart3, History, Flame } from 'lucide-react';
-import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
+import { X, Check, Sparkles, TrendingUp, Shield, Zap, Crown, Star, Clock, Camera, Bot, BarChart3, History } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface PremiumUpgradeModalProps {
   isOpen: boolean;
@@ -107,7 +107,6 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'scan_limit' }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogOverlay className="bg-black/80 backdrop-blur-sm" />
       <DialogContent className="max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto p-0 bg-gradient-to-b from-background via-background to-primary/5 border border-primary/20 rounded-3xl shadow-[0_0_60px_rgba(0,245,255,0.15)]">
         {/* Close button */}
         <button
