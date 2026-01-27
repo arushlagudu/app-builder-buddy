@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Sparkles, Zap, Flame, Loader2, Sun, Moon, Calendar, ChevronDown, ChevronUp, Clock, Droplets, Info, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface RoutineStep {
   step: number;
@@ -124,6 +125,32 @@ export function RoutineGenerator({ skinType, concerns, problems, score, climate,
 
       const data = await response.json();
       setGeneratedRoutine(data);
+      
+      // Save routine to database
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { error: saveError } = await supabase
+          .from('generated_routines')
+          .insert({
+            user_id: user.id,
+            routine_type: 'advanced',
+            intensity: selectedIntensity,
+            routine_title: data.routineTitle,
+            routine_summary: data.routineSummary,
+            morning_routine: data.morningRoutine,
+            evening_routine: data.eveningRoutine,
+            weekly_treatments: data.weeklyTreatments || null,
+            tips: data.tips || null,
+            skin_type: skinType,
+            concerns: concerns,
+            score: score,
+          });
+        
+        if (saveError) {
+          console.error('Failed to save routine:', saveError);
+        }
+      }
+      
       toast.success('Your personalized routine is ready!');
     } catch (error) {
       console.error('Error generating routine:', error);

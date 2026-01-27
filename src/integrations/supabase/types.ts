@@ -95,6 +95,57 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_routines: {
+        Row: {
+          concerns: string[] | null
+          created_at: string
+          evening_routine: Json | null
+          id: string
+          intensity: string | null
+          morning_routine: Json | null
+          routine_summary: string | null
+          routine_title: string | null
+          routine_type: string
+          score: number | null
+          skin_type: string | null
+          tips: Json | null
+          user_id: string
+          weekly_treatments: Json | null
+        }
+        Insert: {
+          concerns?: string[] | null
+          created_at?: string
+          evening_routine?: Json | null
+          id?: string
+          intensity?: string | null
+          morning_routine?: Json | null
+          routine_summary?: string | null
+          routine_title?: string | null
+          routine_type?: string
+          score?: number | null
+          skin_type?: string | null
+          tips?: Json | null
+          user_id: string
+          weekly_treatments?: Json | null
+        }
+        Update: {
+          concerns?: string[] | null
+          created_at?: string
+          evening_routine?: Json | null
+          id?: string
+          intensity?: string | null
+          morning_routine?: Json | null
+          routine_summary?: string | null
+          routine_title?: string | null
+          routine_type?: string
+          score?: number | null
+          skin_type?: string | null
+          tips?: Json | null
+          user_id?: string
+          weekly_treatments?: Json | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
