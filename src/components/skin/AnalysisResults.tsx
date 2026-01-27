@@ -40,10 +40,14 @@ interface AnalysisResultsProps {
   onDownloadReport: () => void;
 }
 
-const iconMap = {
+const iconMap: Record<string, typeof Droplet> = {
   hydration: Droplet,
   inflammation: AlertTriangle,
   barrier: Zap,
+};
+
+const getIcon = (iconKey: string) => {
+  return iconMap[iconKey] || Zap;
 };
 
 export function AnalysisResults({ data, skinType, concerns, climate, pollution, onDownloadReport }: AnalysisResultsProps) {
@@ -67,7 +71,7 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
         <h3 className="text-sm font-medium text-muted-foreground mb-3 px-1">Core Problems Identified</h3>
         <div className="grid gap-3">
           {data.problems.map((problem, index) => {
-            const Icon = iconMap[problem.icon];
+            const Icon = getIcon(problem.icon);
             return (
               <div key={index} className="glass-card p-4 animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
                 <div className="flex items-start gap-3">
