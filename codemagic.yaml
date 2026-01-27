@@ -13,12 +13,17 @@ workflows:
       - name: Install npm dependencies
         script: |
           npm install
+      - name: Install Capacitor iOS
+        script: |
+          npm install @capacitor/ios
       - name: Build web assets
         script: |
           npm run build
       - name: Add iOS platform
         script: |
           npx cap add ios
+          ls -la
+          ls -la ios/App || echo "ios/App not found"
       - name: Update iOS platform
         script: |
           npx cap update ios
