@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, Zap, Flame, Loader2, Sun, Moon, Calendar, ChevronDown, ChevronUp, Clock, Droplets, Info } from 'lucide-react';
+import { Sparkles, Zap, Flame, Loader2, Sun, Moon, Calendar, ChevronDown, ChevronUp, Clock, Droplets, Info, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface RoutineStep {
@@ -9,6 +9,7 @@ interface RoutineStep {
   frequency: string;
   howToUse: string;
   reason: string;
+  productLink?: string;
 }
 
 interface WeeklyTreatment {
@@ -17,6 +18,7 @@ interface WeeklyTreatment {
   frequency: string;
   howToUse: string;
   reason: string;
+  productLink?: string;
 }
 
 interface GeneratedRoutine {
@@ -152,7 +154,21 @@ export function RoutineGenerator({ skinType, concerns, problems, score, climate,
                     {step.frequency}
                   </span>
                 </div>
-                <p className="text-sm font-medium text-foreground">{step.productName}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium text-foreground">{step.productName}</p>
+                  {step.productLink && (
+                    <a
+                      href={step.productLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-primary hover:text-primary/80 transition-colors"
+                      title="Find where to buy"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
               </div>
               {isExpanded ? (
                 <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -253,7 +269,21 @@ export function RoutineGenerator({ skinType, concerns, problems, score, climate,
                             {treatment.frequency}
                           </span>
                         </div>
-                        <p className="text-sm font-medium text-foreground">{treatment.productName}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-foreground">{treatment.productName}</p>
+                          {treatment.productLink && (
+                            <a
+                              href={treatment.productLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-rose-400 hover:text-rose-300 transition-colors"
+                              title="Find where to buy"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          )}
+                        </div>
                       </div>
                       {isExpanded ? (
                         <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
