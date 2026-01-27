@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink, Sparkles } from 'lucide-react';
+import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink, Sparkles, Crown, Lock } from 'lucide-react';
 import { ScoreGauge } from './ScoreGauge';
 import { RoutineGenerator } from './RoutineGenerator';
 
@@ -38,6 +38,8 @@ interface AnalysisResultsProps {
   climate?: string;
   pollution?: string;
   onDownloadReport: () => void;
+  isPremium?: boolean;
+  onUpgradeClick?: () => void;
 }
 
 const iconMap: Record<string, typeof Droplet> = {
@@ -50,10 +52,18 @@ const getIcon = (iconKey: string) => {
   return iconMap[iconKey] || Zap;
 };
 
-export function AnalysisResults({ data, skinType, concerns, climate, pollution, onDownloadReport }: AnalysisResultsProps) {
+export function AnalysisResults({ data, skinType, concerns, climate, pollution, onDownloadReport, isPremium = false, onUpgradeClick }: AnalysisResultsProps) {
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showRoutineGenerator, setShowRoutineGenerator] = useState(false);
+
+  const handleRoutineClick = () => {
+    if (!isPremium && onUpgradeClick) {
+      onUpgradeClick();
+    } else {
+      setShowRoutineGenerator(true);
+    }
+  };
 
   const amRoutine = data.routine.filter(s => s.time === 'AM' || s.time === 'BOTH');
   const pmRoutine = data.routine.filter(s => s.time === 'PM' || s.time === 'BOTH');
@@ -232,11 +242,23 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
       <div className="space-y-4">
         {!showRoutineGenerator ? (
           <button
-            onClick={() => setShowRoutineGenerator(true)}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+            onClick={handleRoutineClick}
+            className={`w-full py-4 rounded-2xl font-medium flex items-center justify-center gap-2 transition-opacity relative overflow-hidden ${
+              isPremium 
+                ? 'bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90' 
+                : 'bg-gradient-to-r from-secondary/80 to-primary/80 text-white'
+            }`}
           >
-            <Sparkles className="w-5 h-5" />
+            {!isPremium && (
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
+            )}
+            {isPremium ? (
+              <Sparkles className="w-5 h-5" />
+            ) : (
+              <Crown className="w-5 h-5" />
+            )}
             Customized Personalized Routine with Instructions
+            {!isPremium && <Lock className="w-4 h-4 ml-1" />}
           </button>
         ) : (
           <RoutineGenerator
