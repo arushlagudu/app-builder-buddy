@@ -26,54 +26,66 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50">
       <div className="glass-card mx-2 mb-3 rounded-2xl border-t-0">
-        <div className="flex items-center py-2">
+        <div className="flex items-end py-2 px-1">
           {/* Left tabs */}
-          <div className="flex items-center justify-around flex-1">
+          <div className="flex items-center justify-evenly flex-1">
             {leftTabs.map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
                 onClick={() => onTabChange(id)}
-                className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all duration-300 ${
+                className={`flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-xl transition-all duration-300 min-w-[52px] ${
                   activeTab === id
                     ? 'text-primary bg-primary/10'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Icon className={`w-5 h-5 ${activeTab === id ? 'text-glow-cyan' : ''}`} />
-                <span className="text-[10px] font-medium">{label}</span>
+                <span className="text-[9px] font-medium leading-tight text-center">{label}</span>
               </button>
             ))}
           </div>
 
-          {/* Center SKYN tab */}
+          {/* Center SKYN tab - elevated and prominent */}
           <button
             onClick={() => onTabChange(centerTab.id)}
-            className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-all duration-300 ${
+            className={`relative flex flex-col items-center gap-1 px-5 py-2 -mt-3 rounded-2xl transition-all duration-300 ${
               activeTab === centerTab.id
-                ? 'text-secondary bg-secondary/10'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'text-secondary bg-gradient-to-br from-secondary/20 to-primary/10 shadow-[0_0_20px_rgba(112,0,255,0.4)]'
+                : 'text-muted-foreground hover:text-secondary bg-background/50 hover:bg-secondary/10'
             }`}
           >
-            <centerTab.icon className={`w-5 h-5 ${activeTab === centerTab.id ? 'text-glow-purple' : ''}`} />
-            <span className={`text-[10px] font-medium ${activeTab === centerTab.id ? 'text-secondary' : ''}`}>
+            {/* Glow ring behind icon */}
+            <div className={`absolute top-1 w-10 h-10 rounded-full transition-all duration-300 ${
+              activeTab === centerTab.id 
+                ? 'bg-secondary/20 blur-md animate-pulse' 
+                : ''
+            }`} />
+            <centerTab.icon className={`relative w-7 h-7 transition-transform duration-300 ${
+              activeTab === centerTab.id 
+                ? 'text-glow-purple scale-110' 
+                : ''
+            }`} />
+            <span className={`text-[10px] font-bold tracking-wide ${
+              activeTab === centerTab.id ? 'text-secondary' : ''
+            }`}>
               {centerTab.label}
             </span>
           </button>
 
           {/* Right tabs */}
-          <div className="flex items-center justify-around flex-1">
+          <div className="flex items-center justify-evenly flex-1">
             {rightTabs.map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
                 onClick={() => onTabChange(id)}
-                className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all duration-300 ${
+                className={`flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-xl transition-all duration-300 min-w-[52px] ${
                   activeTab === id
                     ? 'text-primary bg-primary/10'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Icon className={`w-5 h-5 ${activeTab === id ? 'text-glow-cyan' : ''}`} />
-                <span className="text-[10px] font-medium">{label}</span>
+                <span className="text-[9px] font-medium leading-tight text-center">{label}</span>
               </button>
             ))}
           </div>
