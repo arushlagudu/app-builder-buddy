@@ -1,6 +1,6 @@
-import { Scan, Package, Sparkles, ListChecks, Flame, TrendingUp } from 'lucide-react';
+import { Scan, Package, Sparkles, ListChecks, Flame, TrendingUp, Dna } from 'lucide-react';
 
-type Tab = 'scan' | 'history' | 'progress' | 'scanner' | 'coach' | 'routines' | 'streaks' | 'settings';
+type Tab = 'scan' | 'history' | 'progress' | 'scanner' | 'skyn' | 'coach' | 'routines' | 'streaks' | 'settings';
 
 interface BottomNavProps {
   activeTab: Tab;
@@ -11,10 +11,10 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const tabs = [
     { id: 'scan' as Tab, icon: Scan, label: 'Scan' },
     { id: 'routines' as Tab, icon: ListChecks, label: 'Routines' },
-    { id: 'scanner' as Tab, icon: Package, label: 'Product Scanner' },
+    { id: 'scanner' as Tab, icon: Package, label: 'Products' },
+    { id: 'skyn' as Tab, icon: Dna, label: 'SKYN' },
     { id: 'coach' as Tab, icon: Sparkles, label: 'Coach' },
-    { id: 'progress' as Tab, icon: TrendingUp, label: 'Progress Analytics' },
-    { id: 'streaks' as Tab, icon: Flame, label: 'Streaks' },
+    { id: 'progress' as Tab, icon: TrendingUp, label: 'Progress' },
   ];
 
   return (
@@ -27,12 +27,20 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
               onClick={() => onTabChange(id)}
               className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-300 ${
                 activeTab === id
-                  ? 'text-primary bg-primary/10'
+                  ? id === 'skyn' 
+                    ? 'text-secondary bg-secondary/10' 
+                    : 'text-primary bg-primary/10'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className={`w-5 h-5 ${activeTab === id ? 'text-glow-cyan' : ''}`} />
-              <span className="text-[10px] font-medium">{label}</span>
+              <Icon className={`w-5 h-5 ${
+                activeTab === id 
+                  ? id === 'skyn' ? 'text-glow-purple' : 'text-glow-cyan' 
+                  : ''
+              }`} />
+              <span className={`text-[10px] font-medium ${id === 'skyn' && activeTab === id ? 'text-secondary' : ''}`}>
+                {label}
+              </span>
             </button>
           ))}
         </div>
