@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, ChevronDown, ChevronUp, Sun, Moon, Sparkles, Zap, Flame, Clock, ExternalLink, Trash2 } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, Sun, Moon, Leaf, Zap, Flame, Clock, ExternalLink, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
@@ -30,7 +30,7 @@ interface SavedRoutine {
 }
 
 const intensityIcons = {
-  simple: Sparkles,
+  simple: Leaf,
   medium: Zap,
   intense: Flame,
 };
@@ -122,7 +122,7 @@ export function RoutineHistory() {
       
       {routines.map((routine) => {
         const isExpanded = expandedRoutine === routine.id;
-        const IntensityIcon = routine.intensity ? intensityIcons[routine.intensity as keyof typeof intensityIcons] : Sparkles;
+        const IntensityIcon = routine.intensity ? intensityIcons[routine.intensity as keyof typeof intensityIcons] : Leaf;
         const intensityColor = routine.intensity ? intensityColors[routine.intensity as keyof typeof intensityColors] : 'text-primary';
 
         return (

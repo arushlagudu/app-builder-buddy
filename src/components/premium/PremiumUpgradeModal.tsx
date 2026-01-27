@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Check, Sparkles, TrendingUp, Shield, Zap, Crown, Star, Clock, Camera, Bot, BarChart3, History } from 'lucide-react';
+import { X, Check, Wand2, TrendingUp, Shield, Zap, Crown, Star, Clock, Camera, Bot, BarChart3, History } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface PremiumUpgradeModalProps {
@@ -47,7 +47,7 @@ const premiumFeatures = [
     highlight: true
   },
   {
-    icon: Sparkles,
+    icon: Wand2,
     title: "Custom Routine with Instructions",
     description: "Detailed AM/PM routines with exact application steps"
   },

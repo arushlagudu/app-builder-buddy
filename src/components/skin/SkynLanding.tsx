@@ -3,7 +3,7 @@ import {
   ScanFace, 
   TrendingUp, 
   Camera, 
-  Sparkles, 
+  Bot, 
   Flame,
   Crown,
   ChevronRight,
@@ -47,7 +47,7 @@ const features = [
     buzzwords: ['Instant decode', 'Conflict detection', 'Smart matching'],
   },
   {
-    icon: Sparkles,
+    icon: Bot,
     title: 'Neural AI Coach',
     description: 'Adaptive recommendations that learn from your skin',
     premium: true,
@@ -119,7 +119,7 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan }: S
               variant="outline"
               className="border-primary/30 hover:bg-primary/10"
             >
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Eye className="w-4 h-4 mr-2" />
               Take the Tour
             </Button>
             

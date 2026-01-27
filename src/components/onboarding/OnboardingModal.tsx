@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Sparkles, 
+  Dna, 
   ScanFace, 
   TrendingUp, 
   Camera, 
@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   Droplets,
   Shield,
-  Zap
+  Zap,
+  Star
 } from 'lucide-react';
 
 interface OnboardingModalProps {
@@ -31,7 +32,7 @@ const steps = [
     subtitle: 'Your AI-Powered Skin Analysis Companion',
     description: 'Get clinical-grade skin analysis and personalized skincare routines powered by advanced AI. Let\'s get you started!',
     note: '💡 You can replay this tutorial anytime from Settings',
-    icon: Sparkles,
+    icon: Dna,
     features: [
       { icon: Shield, label: 'Science-backed analysis' },
       { icon: Droplets, label: 'Personalized routines' },
@@ -60,7 +61,7 @@ const steps = [
     features: [
       { icon: Camera, label: 'Before/After comparisons' },
       { icon: TrendingUp, label: 'Score trend analysis' },
-      { icon: Sparkles, label: 'Visual improvements' },
+      { icon: Star, label: 'Visual improvements' },
     ],
   },
   {

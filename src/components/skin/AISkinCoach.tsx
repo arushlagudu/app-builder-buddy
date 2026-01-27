@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, Sun, Cloud, Wind, Droplet, Check, RefreshCw, Bell, TrendingUp, TrendingDown, Brain, Crown, MessageCircle } from 'lucide-react';
+import { Bot, Sun, Cloud, Wind, Droplet, Check, RefreshCw, Bell, TrendingUp, TrendingDown, Brain, Crown, MessageCircle, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAICoachUsage } from '@/hooks/useAICoachUsage';
@@ -152,7 +152,7 @@ export function AISkinCoach({ skinType, concerns, climate, score, previousScore,
     switch (type) {
       case 'weather': return Sun;
       case 'routine': return Droplet;
-      case 'product': return Sparkles;
+      case 'product': return Star;
       default: return Bell;
     }
   };
@@ -241,7 +241,7 @@ export function AISkinCoach({ skinType, concerns, climate, score, previousScore,
       <div className="glass-card p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
+            <Bot className="w-5 h-5 text-primary" />
             <h3 className="font-medium">AI Skin Coach</h3>
             {isPremium && (
               <span className="px-2 py-0.5 rounded-full bg-secondary/20 text-secondary text-xs font-medium flex items-center gap-1">
@@ -275,7 +275,7 @@ export function AISkinCoach({ skinType, concerns, climate, score, previousScore,
       {/* Tips List */}
       {tips.length === 0 ? (
         <div className="glass-card p-8 text-center">
-          <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
+          <Bot className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
           <p className="text-muted-foreground">No tips yet</p>
           <button
             onClick={() => generateDailyTips(false)}
