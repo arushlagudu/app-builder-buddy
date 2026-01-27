@@ -1,4 +1,4 @@
-import { Scan, Clock, Settings, Package, TrendingUp, Sparkles, Camera, ListChecks, Flame } from 'lucide-react';
+import { Scan, Settings, Package, Sparkles, ListChecks, Flame } from 'lucide-react';
 
 type Tab = 'scan' | 'history' | 'progress' | 'scanner' | 'coach' | 'routines' | 'streaks' | 'settings';
 
@@ -14,6 +14,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
     { id: 'routines' as Tab, icon: ListChecks, label: 'Routines' },
     { id: 'scanner' as Tab, icon: Package, label: 'Products' },
     { id: 'coach' as Tab, icon: Sparkles, label: 'Coach' },
+    { id: 'settings' as Tab, icon: Settings, label: 'Settings' },
   ];
 
   return (
