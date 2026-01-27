@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, Sun, Cloud, Wind, Droplet, Check, RefreshCw, Bell, TrendingUp, TrendingDown, Brain } from 'lucide-react';
+import { Sparkles, Sun, Cloud, Wind, Droplet, Check, RefreshCw, Bell, TrendingUp, TrendingDown, Brain, Crown, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useAICoachUsage } from '@/hooks/useAICoachUsage';
 import { toast } from 'sonner';
 import { MonthlyScanReminder } from './MonthlyScanReminder';
 
@@ -24,10 +25,12 @@ interface AISkinCoachProps {
   avoidIngredients?: { name: string; reason: string }[] | null;
   prescriptionIngredients?: { name: string; reason: string }[] | null;
   lastScanDate?: string;
+  onUpgrade?: () => void;
 }
 
-export function AISkinCoach({ skinType, concerns, climate, score, previousScore, problems, avoidIngredients, prescriptionIngredients, lastScanDate }: AISkinCoachProps) {
+export function AISkinCoach({ skinType, concerns, climate, score, previousScore, problems, avoidIngredients, prescriptionIngredients, lastScanDate, onUpgrade }: AISkinCoachProps) {
   const { user } = useAuth();
+  const { questionsRemaining, canAsk, incrementUsage, dailyLimit, isPremium } = useAICoachUsage();
   const [tips, setTips] = useState<DailyTip[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -55,9 +58,9 @@ export function AISkinCoach({ skinType, concerns, climate, score, previousScore,
       if (error) throw error;
       setTips(data || []);
 
-      // Generate tips if none for today
+      // Generate tips if none for today (auto-generate doesn't count towards limit)
       if (!data || data.length === 0) {
-        await generateDailyTips();
+        await generateDailyTips(true);
       }
     } catch (error) {
       console.error('Failed to fetch tips:', error);
@@ -66,8 +69,16 @@ export function AISkinCoach({ skinType, concerns, climate, score, previousScore,
     }
   };
 
-  const generateDailyTips = async () => {
+  const generateDailyTips = async (isAutoGenerate = false) => {
     if (!user) return;
+
+    // Check if user can ask (only for manual refresh)
+    if (!isAutoGenerate && !canAsk) {
+      toast.error('Daily limit reached', {
+        description: 'Upgrade to Premium for unlimited AI coaching',
+      });
+      return;
+    }
     
     setGenerating(true);
     try {
@@ -109,6 +120,12 @@ export function AISkinCoach({ skinType, concerns, climate, score, previousScore,
 
       if (error) throw error;
       setTips(data || []);
+
+      // Increment usage for manual refreshes only
+      if (!isAutoGenerate) {
+        await incrementUsage();
+      }
+
       toast.success('Fresh tips generated!');
     } catch (error) {
       console.error('Failed to generate tips:', error);
@@ -187,17 +204,57 @@ export function AISkinCoach({ skinType, concerns, climate, score, previousScore,
     <div className="space-y-4">
       {/* Monthly Scan Reminder */}
       <MonthlyScanReminder lastScanDate={lastScanDate} />
+
+      {/* Usage Banner for Free Users */}
+      {!isPremium && (
+        <div className="glass-card p-4 border border-secondary/30 bg-gradient-to-br from-secondary/10 to-primary/5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                <MessageCircle className="w-5 h-5 text-secondary" />
+              </div>
+              <div>
+                <p className="font-medium text-sm">
+                  {questionsRemaining > 0 ? (
+                    <><span className="text-secondary">{questionsRemaining}</span> of {dailyLimit} free tips remaining today</>
+                  ) : (
+                    <span className="text-amber-400">Daily limit reached</span>
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {questionsRemaining > 0 ? 'Resets at midnight' : 'Upgrade for unlimited access'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onUpgrade}
+              className="px-3 py-1.5 rounded-lg bg-secondary/20 text-secondary text-xs font-medium hover:bg-secondary/30 transition-colors flex items-center gap-1"
+            >
+              <Crown className="w-3 h-3" />
+              Unlimited
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="glass-card p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             <h3 className="font-medium">AI Skin Coach</h3>
+            {isPremium && (
+              <span className="px-2 py-0.5 rounded-full bg-secondary/20 text-secondary text-xs font-medium flex items-center gap-1">
+                <Crown className="w-3 h-3" />
+                Premium
+              </span>
+            )}
           </div>
           <button
-            onClick={generateDailyTips}
-            disabled={generating}
-            className="p-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors disabled:opacity-50"
+            onClick={() => generateDailyTips(false)}
+            disabled={generating || (!isPremium && !canAsk)}
+            className="p-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title={!canAsk && !isPremium ? 'Daily limit reached' : 'Generate new tips'}
           >
             <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
           </button>
@@ -221,9 +278,9 @@ export function AISkinCoach({ skinType, concerns, climate, score, previousScore,
           <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
           <p className="text-muted-foreground">No tips yet</p>
           <button
-            onClick={generateDailyTips}
-            disabled={generating}
-            className="mt-4 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium"
+            onClick={() => generateDailyTips(false)}
+            disabled={generating || (!isPremium && !canAsk)}
+            className="mt-4 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
           >
             Generate Today's Tips
           </button>
