@@ -11,10 +11,10 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const tabs = [
     { id: 'scan' as Tab, icon: Scan, label: 'Scan' },
     { id: 'routines' as Tab, icon: ListChecks, label: 'Routines' },
-    { id: 'scanner' as Tab, icon: Package, label: 'Products' },
+    { id: 'scanner' as Tab, icon: Package, label: 'Product Scanner' },
     { id: 'skyn' as Tab, icon: Dna, label: 'SKYN' },
-    { id: 'coach' as Tab, icon: Sparkles, label: 'Coach' },
-    { id: 'progress' as Tab, icon: TrendingUp, label: 'Progress' },
+    { id: 'coach' as Tab, icon: Sparkles, label: 'AI Coach' },
+    { id: 'progress' as Tab, icon: TrendingUp, label: 'Progress Analytics' },
   ];
 
   return (

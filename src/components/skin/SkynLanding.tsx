@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { 
   Dna, 
   ScanFace, 
@@ -93,8 +92,6 @@ const premiumHighlights = [
 ];
 
 export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan }: SkynLandingProps) {
-  const [showAllFeatures, setShowAllFeatures] = useState(false);
-  const displayedFeatures = showAllFeatures ? features : features.slice(0, 4);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -184,7 +181,7 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan }: S
         </h2>
         
         <div className="grid gap-3">
-          {displayedFeatures.map((feature, idx) => {
+          {features.map((feature, idx) => {
             const Icon = feature.icon;
             return (
               <Card 
@@ -236,32 +233,13 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan }: S
           })}
         </div>
         
-        {!showAllFeatures && (
-          <Button
-            variant="ghost"
-            className="w-full text-muted-foreground hover:text-foreground"
-            onClick={() => setShowAllFeatures(true)}
-          >
-            Show all features
-            <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
-        )}
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
-          <div className="text-2xl font-bold text-primary">94%</div>
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wide">AI Accuracy</div>
-        </div>
-        <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
-          <div className="text-2xl font-bold text-secondary">50K+</div>
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Scans Done</div>
-        </div>
-        <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
-          <div className="text-2xl font-bold text-primary">4.9★</div>
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wide">User Rating</div>
-        </div>
+      <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 text-center">
+        <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">99%</div>
+        <div className="text-sm text-muted-foreground mt-1">Skin Analysis Accuracy</div>
+        <div className="text-xs text-muted-foreground/70 mt-0.5">Powered by Deep Machine Learning</div>
       </div>
 
       {/* CTA */}
