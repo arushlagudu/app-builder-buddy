@@ -64,7 +64,7 @@ const premiumFeatures = [
   {
     icon: Bot,
     title: "AI Skin Coach",
-    description: "Daily personalized tips & weather-based adjustments"
+    description: "Neural-powered insights that adapt in real-time to your skin"
   },
   {
     icon: BarChart3,
@@ -75,11 +75,6 @@ const premiumFeatures = [
     icon: History,
     title: "Full Analysis History",
     description: "Access all your past scans and track improvements"
-  },
-  {
-    icon: Crown,
-    title: "Priority Support",
-    description: "Get help when you need it, fast"
   }
 ];
 
