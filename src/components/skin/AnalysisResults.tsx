@@ -236,7 +236,7 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
             className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
             <Sparkles className="w-5 h-5" />
-            Make My Personalized Routine
+            Customized Personalized Routine with Instructions
           </button>
         ) : (
           <RoutineGenerator
