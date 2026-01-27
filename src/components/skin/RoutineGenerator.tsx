@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, Zap, Flame, Loader2, Sun, Moon, Calendar, ChevronDown, ChevronUp, Clock, Droplets, Info, ExternalLink } from 'lucide-react';
+import { Sparkles, Zap, Flame, Loader2, Sun, Moon, Calendar, ChevronDown, ChevronUp, Clock, Droplets, Info, ExternalLink, Leaf, FlaskConical } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -38,9 +38,11 @@ interface RoutineGeneratorProps {
   score: number;
   climate: string;
   pollution: string;
+  previousScore?: number;
 }
 
 type Intensity = 'simple' | 'medium' | 'intense';
+type ChemicalPreference = 'natural' | 'balanced' | 'clinical';
 
 const intensityConfig = {
   simple: {
@@ -72,11 +74,53 @@ const intensityConfig = {
   },
 };
 
-export function RoutineGenerator({ skinType, concerns, problems, score, climate, pollution }: RoutineGeneratorProps) {
+const chemicalConfig = {
+  natural: {
+    label: 'Natural',
+    description: 'Plant-based • Gentle formulas',
+    icon: Leaf,
+    color: 'text-green-500',
+    bgColor: 'bg-green-500/10',
+    borderColor: 'border-green-500/30',
+    activeColor: 'bg-green-500',
+  },
+  balanced: {
+    label: 'Balanced',
+    description: 'Mix of natural & clinical',
+    icon: Sparkles,
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-500/10',
+    borderColor: 'border-blue-500/30',
+    activeColor: 'bg-blue-500',
+  },
+  clinical: {
+    label: 'Clinical',
+    description: 'Active ingredients • Max efficacy',
+    icon: FlaskConical,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-500/10',
+    borderColor: 'border-purple-500/30',
+    activeColor: 'bg-purple-500',
+  },
+};
+
+export function RoutineGenerator({ skinType, concerns, problems, score, climate, pollution, previousScore }: RoutineGeneratorProps) {
   const [selectedIntensity, setSelectedIntensity] = useState<Intensity | null>(null);
+  const [selectedChemical, setSelectedChemical] = useState<ChemicalPreference>('balanced');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRoutine, setGeneratedRoutine] = useState<GeneratedRoutine | null>(null);
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
+
+  // AI-suggested intensity based on progress
+  const getSuggestedIntensity = (): Intensity | null => {
+    if (previousScore === undefined) return null;
+    const delta = score - previousScore;
+    if (delta >= 2) return 'simple'; // Improving significantly
+    if (delta <= -2) return 'intense'; // Declining
+    return 'medium'; // Stable
+  };
+
+  const suggestedIntensity = getSuggestedIntensity();
 
   const toggleStep = (key: string) => {
     setExpandedSteps(prev => {
@@ -106,10 +150,12 @@ export function RoutineGenerator({ skinType, concerns, problems, score, climate,
         },
         body: JSON.stringify({
           intensity: selectedIntensity,
+          chemicalPreference: selectedChemical,
           skinType,
           concerns,
           problems,
           score,
+          previousScore,
           climate,
           pollution,
         }),
@@ -369,12 +415,23 @@ export function RoutineGenerator({ skinType, concerns, problems, score, climate,
       <div className="text-center">
         <h3 className="text-lg font-semibold mb-2">Create Your Routine</h3>
         <p className="text-sm text-muted-foreground">
-          Choose your preferred intensity level for a personalized skincare routine
+          Customize your routine intensity and ingredient preferences
         </p>
       </div>
 
+      {/* AI Suggestion Banner */}
+      {suggestedIntensity && (
+        <div className="p-3 rounded-xl bg-primary/10 border border-primary/30">
+          <p className="text-xs text-primary font-medium flex items-center gap-2">
+            🧠 AI Recommendation: Based on your progress, we suggest a <span className="font-bold">{suggestedIntensity}</span> routine
+          </p>
+        </div>
+      )}
+
       {/* Intensity Selection */}
-      <div className="grid gap-3">
+      <div>
+        <h4 className="text-sm font-medium mb-3">Routine Intensity</h4>
+        <div className="grid gap-3">
         {(Object.keys(intensityConfig) as Intensity[]).map((intensity) => {
           const config = intensityConfig[intensity];
           const Icon = config.icon;
@@ -417,6 +474,56 @@ export function RoutineGenerator({ skinType, concerns, problems, score, climate,
             </button>
           );
         })}
+        </div>
+      </div>
+
+      {/* Chemical Preference Selection */}
+      <div>
+        <h4 className="text-sm font-medium mb-3">Ingredient Preference</h4>
+        <div className="grid gap-3">
+          {(Object.keys(chemicalConfig) as ChemicalPreference[]).map((chemical) => {
+            const config = chemicalConfig[chemical];
+            const Icon = config.icon;
+            const isSelected = selectedChemical === chemical;
+
+            return (
+              <button
+                key={chemical}
+                onClick={() => setSelectedChemical(chemical)}
+                className={`p-4 rounded-xl border-2 transition-all text-left ${
+                  isSelected
+                    ? `${config.borderColor} ${config.bgColor}`
+                    : 'border-muted/30 hover:border-muted/50'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl ${config.bgColor} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${config.color}`} />
+                  </div>
+                  <div className="flex-1">
+                    <p className={`font-medium ${isSelected ? config.color : 'text-foreground'}`}>
+                      {config.label}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{config.description}</p>
+                  </div>
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 transition-all ${
+                      isSelected
+                        ? `${config.activeColor} border-transparent`
+                        : 'border-muted-foreground/30'
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-white" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Generate Button */}

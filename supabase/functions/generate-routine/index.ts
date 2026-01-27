@@ -32,6 +32,35 @@ const getIntensityDescription = (intensity: string) => {
   }
 };
 
+const getChemicalDescription = (preference: string) => {
+  switch (preference) {
+    case 'natural':
+      return `NATURAL/ORGANIC PREFERENCE:
+- Prioritize plant-derived, botanical ingredients
+- Avoid harsh chemicals, synthetic fragrances, parabens, sulfates
+- Focus on gentle, non-irritating formulas
+- Prefer ingredients like aloe vera, jojoba oil, green tea, chamomile, rosehip
+- Choose mineral sunscreens over chemical ones
+- Emphasize clean beauty brands`;
+    case 'clinical':
+      return `CLINICAL/ACTIVE PREFERENCE:
+- Prioritize proven active ingredients for maximum efficacy
+- Include retinoids, AHAs, BHAs, vitamin C, niacinamide, peptides
+- Higher concentration actives are acceptable
+- Focus on evidence-based, dermatologist-recommended products
+- Include pharmaceutical-grade ingredients when beneficial
+- Emphasize results over ingredient source`;
+    case 'balanced':
+    default:
+      return `BALANCED PREFERENCE:
+- Mix of natural and clinical ingredients
+- Gentle actives at moderate concentrations
+- Clean formulas with proven efficacy
+- Avoid harsh irritants but include effective actives
+- Best of both worlds approach`;
+  }
+};
+
 const generateProductLink = (productName: string): string => {
   const searchQuery = encodeURIComponent(`buy ${productName}`);
   return `https://www.google.com/search?q=${searchQuery}`;
@@ -95,9 +124,9 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { intensity, skinType, concerns, problems, score, climate, pollution } = body;
+    const { intensity, chemicalPreference, skinType, concerns, problems, score, previousScore, climate, pollution } = body;
     
-    console.log("Generating routine with intensity:", intensity, "skinType:", skinType);
+    console.log("Generating routine with intensity:", intensity, "chemical:", chemicalPreference, "skinType:", skinType);
     
     if (!intensity || !skinType) {
       return new Response(
@@ -113,21 +142,42 @@ serve(async (req) => {
     }
 
     const intensityDescription = getIntensityDescription(intensity);
+    const chemicalDescription = getChemicalDescription(chemicalPreference || 'balanced');
+
+    // Calculate progress context
+    let progressContext = '';
+    if (previousScore !== undefined && previousScore !== null) {
+      const delta = score - previousScore;
+      if (delta >= 2) {
+        progressContext = `\n\nPROGRESS NOTE: User's skin has SIGNIFICANTLY IMPROVED (+${delta.toFixed(1)} points). Consider suggesting a lighter maintenance routine and congratulate their progress. They may be ready to reduce treatment intensity.`;
+      } else if (delta > 0) {
+        progressContext = `\n\nPROGRESS NOTE: User's skin is IMPROVING (+${delta.toFixed(1)} points). Current routine is working well. Maintain approach with minor optimizations.`;
+      } else if (delta <= -2) {
+        progressContext = `\n\nPROGRESS NOTE: User's skin has DECLINED (${delta.toFixed(1)} points). Consider more intensive treatments or investigating potential irritants/triggers. Extra care and attention needed.`;
+      } else if (delta < 0) {
+        progressContext = `\n\nPROGRESS NOTE: User's skin shows minor fluctuation (${delta.toFixed(1)} points). Monitor closely and maintain consistency.`;
+      }
+    }
 
     const userPrompt = `Create a personalized skincare routine with these parameters:
 
 INTENSITY LEVEL:
 ${intensityDescription}
 
+INGREDIENT PREFERENCE:
+${chemicalDescription}
+
 USER PROFILE:
 - Skin Type: ${skinType}
 - Primary Concerns: ${concerns?.join(", ") || 'general maintenance'}
 - Identified Problems: ${problems?.map((p: any) => p.title).join(", ") || 'none specified'}
 - Current Skin Health Score: ${score || 'not assessed'}/10
+${previousScore !== undefined ? `- Previous Skin Health Score: ${previousScore}/10` : ''}
 - Climate: ${climate || 'temperate'}
 - Pollution Level: ${pollution || 'moderate'}
+${progressContext}
 
-Create a complete routine matching the ${intensity.toUpperCase()} intensity level with specific product recommendations, application instructions, and scientific rationales. Include weekly treatments if appropriate for the intensity level.
+Create a complete routine matching the ${intensity.toUpperCase()} intensity level with ${chemicalPreference?.toUpperCase() || 'BALANCED'} ingredient preferences. Include specific product recommendations, application instructions, and scientific rationales. Include weekly treatments if appropriate for the intensity level.
 
 Return ONLY valid JSON following the specified format.`;
 
