@@ -1,4 +1,4 @@
-import { Crown, Zap, Camera, TrendingUp, Sparkles } from 'lucide-react';
+import { Crown, Zap, Camera, TrendingUp, Sparkles, Package, Clock, ListChecks } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 
 interface PremiumBannerProps {
@@ -14,6 +14,9 @@ export function PremiumBanner({ onUpgrade }: PremiumBannerProps) {
     { icon: Camera, text: 'Unlimited scans' },
     { icon: TrendingUp, text: 'Progress tracking' },
     { icon: Sparkles, text: 'AI Skin Coach' },
+    { icon: Package, text: 'Product Scanner' },
+    { icon: Clock, text: 'Analysis History' },
+    { icon: ListChecks, text: 'Personalized Routines' },
   ];
 
   return (
@@ -35,7 +38,7 @@ export function PremiumBanner({ onUpgrade }: PremiumBannerProps) {
         </p>
       </div>
 
-      <div className="flex gap-4 mb-4">
+      <div className="grid grid-cols-2 gap-2 mb-4">
         {features.map(({ icon: Icon, text }) => (
           <div key={text} className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Icon className="w-3.5 h-3.5 text-primary" />
