@@ -1,4 +1,4 @@
-import { Trophy, Lock, Sparkles } from 'lucide-react';
+import { Trophy, Lock, Star } from 'lucide-react';
 import { useAchievements, Achievement } from '@/hooks/useAchievements';
 import { useStreaks } from '@/hooks/useStreaks';
 import { Progress } from '@/components/ui/progress';
@@ -38,7 +38,7 @@ function AchievementCard({ achievement, unlocked }: { achievement: Achievement; 
       {/* Reward */}
       {unlocked && achievement.reward && (
         <div className="flex items-center gap-1.5 text-xs text-primary">
-          <Sparkles className="w-3 h-3" />
+          <Star className="w-3 h-3" />
           <span>{achievement.reward}</span>
         </div>
       )}

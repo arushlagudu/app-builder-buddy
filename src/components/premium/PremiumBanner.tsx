@@ -1,4 +1,4 @@
-import { Crown, Zap, Camera, TrendingUp, Sparkles, Package, Clock, ListChecks } from 'lucide-react';
+import { Crown, Zap, Camera, TrendingUp, Bot, Package, Clock, ListChecks } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 
 interface PremiumBannerProps {
@@ -13,7 +13,7 @@ export function PremiumBanner({ onUpgrade }: PremiumBannerProps) {
   const features = [
     { icon: Camera, text: 'Unlimited scans' },
     { icon: TrendingUp, text: 'Progress tracking' },
-    { icon: Sparkles, text: 'AI Skin Coach' },
+    { icon: Bot, text: 'AI Skin Coach' },
     { icon: Package, text: 'Product Scanner' },
     { icon: Clock, text: 'Analysis History' },
     { icon: ListChecks, text: 'Personalized Routines' },

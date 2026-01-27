@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, FlaskConical, AlertTriangle, Sparkles, Leaf, Droplet, Shield, Sun, Zap } from 'lucide-react';
+import { X, FlaskConical, AlertTriangle, Star, Leaf, Droplet, Shield, Sun, Zap } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 interface IngredientGlossaryProps {
@@ -28,7 +28,7 @@ const ingredientDatabase: Record<string, IngredientInfo> = {
     function: 'Brightening, Pore Minimizing, Barrier Support',
     howItWorks: 'Boosts ceramide production and regulates sebum. Inhibits melanosome transfer to reduce hyperpigmentation.',
     skinChemistry: 'Water-soluble vitamin that penetrates easily. Works at pH 5-7. Pairs well with most actives except Vitamin C at high concentrations.',
-    icon: Sparkles,
+    icon: Star,
     safetyLevel: 'gentle'
   },
   'hyaluronic acid': {
@@ -84,7 +84,7 @@ const ingredientDatabase: Record<string, IngredientInfo> = {
     function: 'Collagen Support, Firming, Signal Transmission',
     howItWorks: 'Short chains of amino acids that signal skin to produce more collagen and elastin.',
     skinChemistry: 'Different peptides have different functions. Copper peptides for healing, Matrixyl for collagen, Argireline for expression lines.',
-    icon: Sparkles,
+    icon: Star,
     safetyLevel: 'gentle'
   },
   'benzoyl peroxide': {
@@ -205,7 +205,7 @@ export function IngredientGlossary({ ingredient, open, onClose }: IngredientGlos
           {/* Why for you */}
           <div className="glass-card p-4">
             <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-secondary" />
+              <Star className="w-4 h-4 text-secondary" />
               Why This Matters For You
             </h4>
             <p className="text-sm text-muted-foreground leading-relaxed">
