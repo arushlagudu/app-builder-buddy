@@ -140,10 +140,10 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'scan_limit' }:
             {message.subtitle}
           </p>
 
-          {/* Urgency badge */}
-          <div className="relative mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 border border-destructive/30">
-            <Flame className="w-4 h-4 text-destructive animate-pulse" />
-            <span className="text-xs font-medium text-destructive">Limited Time: 40% Off First Month</span>
+          {/* Price badge */}
+          <div className="relative mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30">
+            <Crown className="w-4 h-4 text-primary" />
+            <span className="text-xs font-medium text-primary">Premium Access</span>
           </div>
         </div>
 
@@ -155,8 +155,7 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'scan_limit' }:
             
             <div className="relative">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-2xl text-muted-foreground line-through">$9.99</span>
-                <span className="text-4xl font-bold text-primary">$5.99</span>
+                <span className="text-4xl font-bold text-primary">$9.99</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
               <p className="text-xs text-muted-foreground">Cancel anytime. No hidden fees.</p>
