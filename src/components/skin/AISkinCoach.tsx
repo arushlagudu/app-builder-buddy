@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, Sun, Cloud, Wind, Droplet, Check, RefreshCw, Bell } from 'lucide-react';
+import { Sparkles, Sun, Cloud, Wind, Droplet, Check, RefreshCw, Bell, TrendingUp, TrendingDown, Brain } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { MonthlyScanReminder } from './MonthlyScanReminder';
 
 interface DailyTip {
   id: string;
@@ -18,12 +19,14 @@ interface AISkinCoachProps {
   concerns?: string[];
   climate?: string;
   score?: number | null;
+  previousScore?: number | null;
   problems?: { title: string; description: string }[] | null;
   avoidIngredients?: { name: string; reason: string }[] | null;
   prescriptionIngredients?: { name: string; reason: string }[] | null;
+  lastScanDate?: string;
 }
 
-export function AISkinCoach({ skinType, concerns, climate, score, problems, avoidIngredients, prescriptionIngredients }: AISkinCoachProps) {
+export function AISkinCoach({ skinType, concerns, climate, score, previousScore, problems, avoidIngredients, prescriptionIngredients, lastScanDate }: AISkinCoachProps) {
   const { user } = useAuth();
   const [tips, setTips] = useState<DailyTip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,8 +165,28 @@ export function AISkinCoach({ skinType, concerns, climate, score, problems, avoi
     );
   }
 
+  // Calculate progress insight
+  const getProgressInsight = () => {
+    if (score === null || score === undefined || previousScore === null || previousScore === undefined) return null;
+    const delta = score - previousScore;
+    if (delta >= 2) {
+      return { type: 'improved', message: 'Your skin is showing great improvement! Keep up the excellent work.', icon: TrendingUp, color: 'text-green-400 bg-green-400/20' };
+    } else if (delta > 0) {
+      return { type: 'slight-improvement', message: 'Your skin is on the right track. Stay consistent!', icon: TrendingUp, color: 'text-emerald-400 bg-emerald-400/20' };
+    } else if (delta <= -2) {
+      return { type: 'declined', message: 'Your skin needs extra attention. Follow the tips carefully.', icon: TrendingDown, color: 'text-amber-400 bg-amber-400/20' };
+    } else if (delta < 0) {
+      return { type: 'slight-decline', message: 'Minor fluctuation detected. Stay consistent with your routine.', icon: TrendingDown, color: 'text-yellow-400 bg-yellow-400/20' };
+    }
+    return { type: 'stable', message: 'Your skin health is stable. Keep maintaining your routine.', icon: Brain, color: 'text-primary bg-primary/20' };
+  };
+
+  const progressInsight = getProgressInsight();
+
   return (
     <div className="space-y-4">
+      {/* Monthly Scan Reminder */}
+      <MonthlyScanReminder lastScanDate={lastScanDate} />
       {/* Header */}
       <div className="glass-card p-4">
         <div className="flex items-center justify-between">
@@ -182,6 +205,14 @@ export function AISkinCoach({ skinType, concerns, climate, score, problems, avoi
         <p className="text-sm text-muted-foreground mt-2">
           Personalized daily tips based on your skin profile
         </p>
+
+        {/* Progress Insight */}
+        {progressInsight && (
+          <div className={`mt-3 p-3 rounded-xl flex items-center gap-3 ${progressInsight.color.split(' ')[1]}`}>
+            <progressInsight.icon className={`w-5 h-5 ${progressInsight.color.split(' ')[0]}`} />
+            <p className="text-xs font-medium">{progressInsight.message}</p>
+          </div>
+        )}
       </div>
 
       {/* Tips List */}

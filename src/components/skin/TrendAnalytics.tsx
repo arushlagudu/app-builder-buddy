@@ -3,6 +3,8 @@ import { TrendingUp, TrendingDown, Calendar, Target, Award } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { MonthlyScanReminder } from './MonthlyScanReminder';
+import { ProgressFeedback } from './ProgressFeedback';
 
 interface AnalysisRecord {
   id: string;
@@ -96,8 +98,24 @@ export function TrendAnalytics() {
     score: d.score,
   }));
 
+  const lastScanDate = data.length > 0 ? data[data.length - 1].created_at : undefined;
+  const previousAnalysis = data.length >= 2 ? data[data.length - 2] : null;
+  const latestAnalysis = data[data.length - 1];
+
   return (
     <div className="space-y-4">
+      {/* Monthly Scan Reminder */}
+      <MonthlyScanReminder lastScanDate={lastScanDate} />
+
+      {/* Progress Feedback */}
+      {previousAnalysis && (
+        <ProgressFeedback
+          currentScore={latestScore}
+          previousScore={previousAnalysis.score}
+          currentProblems={latestAnalysis.problems || []}
+          previousProblems={previousAnalysis.problems || []}
+        />
+      )}
       {/* Main Stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="glass-card p-4">
