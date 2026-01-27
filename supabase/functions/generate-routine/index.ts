@@ -32,6 +32,11 @@ const getIntensityDescription = (intensity: string) => {
   }
 };
 
+const generateProductLink = (productName: string): string => {
+  const searchQuery = encodeURIComponent(`buy ${productName}`);
+  return `https://www.google.com/search?q=${searchQuery}`;
+};
+
 const systemPrompt = `You are a Senior Cosmetic Chemist and Board-Certified Dermatologist creating personalized skincare routines.
 
 For each routine step, provide:
@@ -188,7 +193,27 @@ Return ONLY valid JSON following the specified format.`;
       throw new Error("Failed to parse routine data");
     }
 
-    console.log("Routine generated successfully");
+    // Add product links to all routine steps
+    if (routineData.morningRoutine) {
+      routineData.morningRoutine = routineData.morningRoutine.map((step: any) => ({
+        ...step,
+        productLink: generateProductLink(step.productName),
+      }));
+    }
+    if (routineData.eveningRoutine) {
+      routineData.eveningRoutine = routineData.eveningRoutine.map((step: any) => ({
+        ...step,
+        productLink: generateProductLink(step.productName),
+      }));
+    }
+    if (routineData.weeklyTreatments) {
+      routineData.weeklyTreatments = routineData.weeklyTreatments.map((treatment: any) => ({
+        ...treatment,
+        productLink: generateProductLink(treatment.productName),
+      }));
+    }
+
+    console.log("Routine generated successfully with product links");
     
     return new Response(
       JSON.stringify(routineData),
