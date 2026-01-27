@@ -17,6 +17,7 @@ export function PremiumBanner({ onUpgrade }: PremiumBannerProps) {
     { icon: Package, text: 'Product Scanner' },
     { icon: Clock, text: 'Analysis History' },
     { icon: ListChecks, text: 'Personalized Routines' },
+    { icon: TrendingUp, text: 'Trend Analytics' },
   ];
 
   return (
