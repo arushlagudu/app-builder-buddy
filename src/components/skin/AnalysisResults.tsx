@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink, Sparkles, Crown, Lock } from 'lucide-react';
+import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink, Sparkles, Crown, Lock, Info } from 'lucide-react';
 import { ScoreGauge } from './ScoreGauge';
 import { RoutineGenerator } from './RoutineGenerator';
+import { IngredientGlossary } from './IngredientGlossary';
 
 interface Problem {
   title: string;
@@ -56,6 +57,11 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showRoutineGenerator, setShowRoutineGenerator] = useState(false);
+  const [selectedIngredient, setSelectedIngredient] = useState<{
+    name: string;
+    reason: string;
+    type: 'avoid' | 'prescription';
+  } | null>(null);
 
   const handleRoutineClick = () => {
     if (!isPremium && onUpgradeClick) {
@@ -123,11 +129,18 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
             <X className="w-4 h-4" />
             Avoid
           </h4>
+          <p className="text-[10px] text-muted-foreground/60 mb-2 italic">Tap to learn why</p>
           <ul className="space-y-2">
             {data.avoidIngredients.slice(0, 5).map((ingredient, index) => (
-              <li key={index} className="text-xs text-muted-foreground flex items-start gap-2">
-                <X className="w-3 h-3 text-destructive shrink-0 mt-0.5" />
-                <span>{ingredient.name}</span>
+              <li key={index}>
+                <button
+                  onClick={() => setSelectedIngredient({ ...ingredient, type: 'avoid' })}
+                  className="text-xs text-muted-foreground flex items-center gap-2 w-full text-left hover:text-destructive transition-colors group"
+                >
+                  <X className="w-3 h-3 text-destructive shrink-0" />
+                  <span className="flex-1">{ingredient.name}</span>
+                  <Info className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-destructive" />
+                </button>
               </li>
             ))}
           </ul>
@@ -139,16 +152,30 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
             <Check className="w-4 h-4" />
             Prescription
           </h4>
+          <p className="text-[10px] text-muted-foreground/60 mb-2 italic">Tap to learn why</p>
           <ul className="space-y-2">
             {data.prescriptionIngredients.slice(0, 5).map((ingredient, index) => (
-              <li key={index} className="text-xs text-muted-foreground flex items-start gap-2">
-                <Check className="w-3 h-3 text-primary shrink-0 mt-0.5" />
-                <span>{ingredient.name}</span>
+              <li key={index}>
+                <button
+                  onClick={() => setSelectedIngredient({ ...ingredient, type: 'prescription' })}
+                  className="text-xs text-muted-foreground flex items-center gap-2 w-full text-left hover:text-primary transition-colors group"
+                >
+                  <Check className="w-3 h-3 text-primary shrink-0" />
+                  <span className="flex-1">{ingredient.name}</span>
+                  <Info className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+                </button>
               </li>
             ))}
           </ul>
         </div>
       </div>
+
+      {/* Ingredient Glossary */}
+      <IngredientGlossary
+        ingredient={selectedIngredient}
+        open={!!selectedIngredient}
+        onClose={() => setSelectedIngredient(null)}
+      />
 
       {/* Routine Section */}
       <div>
