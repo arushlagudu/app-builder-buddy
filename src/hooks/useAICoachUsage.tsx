@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useSubscription } from './useSubscription';
 
-const FREE_DAILY_TOKENS = 1000;
+const FREE_DAILY_TOKENS = 2500;
 
 export function useAICoachUsage() {
   const { user } = useAuth();
