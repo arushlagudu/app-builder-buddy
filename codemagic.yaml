@@ -15,22 +15,42 @@ workflows:
       - name: Install npm dependencies
         script: |
           npm install
+          # Ensure Capacitor CLI and iOS are installed
+          npm install @capacitor/cli @capacitor/core @capacitor/ios --save
+          # Show installed versions
+          echo "Capacitor versions:"
+          npx cap --version
+          npm ls @capacitor/cli @capacitor/core @capacitor/ios
       - name: Build web assets
         script: |
           npm run build
-      - name: Setup Capacitor iOS
+          echo "Checking dist folder exists:"
+          ls -la dist/
+      - name: Create iOS platform
         script: |
-          # Install iOS platform package
-          npm install @capacitor/ios --save
-          # Initialize iOS project (skip pod install, we'll do it manually)
-          CAPACITOR_SKIP_POD_INSTALL=true npx cap add ios || echo "iOS platform may already exist"
-          # Verify ios folder was created
-          ls -la ios/App || { echo "ERROR: ios/App not created"; exit 1; }
-          # Sync web assets to iOS (skip pod install here too)
-          CAPACITOR_SKIP_POD_INSTALL=true npx cap sync ios
+          echo "Creating iOS platform..."
+          # Use --skip-pod-install flag if available, otherwise set env var
+          npx cap add ios --skip-pod-install 2>&1 || {
+            echo "cap add ios failed, checking if ios folder exists anyway..."
+            if [ -d "ios" ]; then
+              echo "ios folder exists despite error"
+            else
+              echo "FATAL: ios folder not created. Exiting."
+              exit 1
+            fi
+          }
+          echo "Listing project structure:"
+          ls -la
+          ls -la ios/ || echo "No ios folder"
+          ls -la ios/App/ || echo "No ios/App folder"
+      - name: Sync Capacitor
+        script: |
+          npx cap sync ios --skip-pod-install 2>&1 || npx cap copy ios
       - name: Install CocoaPods dependencies
         script: |
           cd ios/App
+          ls -la
+          cat Podfile || echo "No Podfile found!"
           pod install --repo-update
       - name: Build iOS app
         script: |
