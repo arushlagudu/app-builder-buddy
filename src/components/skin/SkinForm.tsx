@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Droplet, Sun, Wind, Sparkles, AlertTriangle, Clock } from 'lucide-react';
+import { Droplet, Sun, Wind, Sparkles, AlertTriangle, Clock, DollarSign } from 'lucide-react';
 
 interface SkinFormData {
   skinType: string;
   concerns: string[];
   climate: string;
   pollution: string;
+  budget: string;
 }
 
 interface SkinFormProps {
@@ -42,12 +43,19 @@ const pollutionLevels = [
   { id: 'high', label: 'High' },
 ];
 
+const budgetLevels = [
+  { id: 'budget', label: '💰 Budget', description: 'Drugstore & affordable' },
+  { id: 'mid', label: '💎 Mid-Range', description: 'Quality brands' },
+  { id: 'luxury', label: '👑 Luxury', description: 'Premium products' },
+];
+
 export function SkinForm({ onSubmit, isValid }: SkinFormProps) {
   const [formData, setFormData] = useState<SkinFormData>({
     skinType: '',
     concerns: [],
     climate: '',
     pollution: '',
+    budget: '',
   });
 
   const handleSkinTypeSelect = (type: string) => {
@@ -73,6 +81,12 @@ export function SkinForm({ onSubmit, isValid }: SkinFormProps) {
 
   const handlePollutionSelect = (level: string) => {
     const newData = { ...formData, pollution: level };
+    setFormData(newData);
+    onSubmit(newData);
+  };
+
+  const handleBudgetSelect = (budget: string) => {
+    const newData = { ...formData, budget };
     setFormData(newData);
     onSubmit(newData);
   };
@@ -123,6 +137,32 @@ export function SkinForm({ onSubmit, isValid }: SkinFormProps) {
               }`}
             >
               {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Budget */}
+      <div className="glass-card p-5">
+        <h3 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
+          <DollarSign className="w-4 h-4 text-primary" />
+          Product Budget
+        </h3>
+        <div className="grid grid-cols-3 gap-2">
+          {budgetLevels.map(({ id, label, description }) => (
+            <button
+              key={id}
+              onClick={() => handleBudgetSelect(id)}
+              className={`p-3 rounded-xl border transition-all duration-300 flex flex-col items-center gap-1 ${
+                formData.budget === id
+                  ? 'border-primary bg-primary/10 glow-cyan'
+                  : 'border-border bg-muted/30 hover:border-primary/50'
+              }`}
+            >
+              <span className={`text-xs font-medium ${formData.budget === id ? 'text-primary' : 'text-foreground'}`}>
+                {label}
+              </span>
+              <span className="text-[10px] text-muted-foreground text-center">{description}</span>
             </button>
           ))}
         </div>

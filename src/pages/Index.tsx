@@ -32,6 +32,7 @@ interface SkinFormData {
   concerns: string[];
   climate: string;
   pollution: string;
+  budget: string;
 }
 
 interface AnalysisData {
@@ -108,7 +109,7 @@ export default function Index() {
     setShowOnboarding(false);
   };
 
-  const isFormValid = formData?.skinType && formData.concerns.length > 0 && formData.climate && formData.pollution;
+  const isFormValid = formData?.skinType && formData.concerns.length > 0 && formData.climate && formData.pollution && formData.budget;
 
   const handleFormSubmit = useCallback((data: SkinFormData) => {
     setFormData(data);
@@ -189,6 +190,7 @@ export default function Index() {
           concerns: formData?.concerns,
           climate: formData?.climate,
           pollution: formData?.pollution,
+          budget: formData?.budget,
         }),
         signal: controller.signal,
       });
