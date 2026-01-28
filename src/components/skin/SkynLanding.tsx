@@ -77,7 +77,7 @@ const premiumHighlights = [
   {
     icon: Microscope,
     title: 'Clinical-Grade Precision',
-    description: 'Dermatologist-validated algorithms with 94% accuracy in skin condition detection',
+    description: 'Dermatologist-validated algorithms with 99% accuracy in skin condition detection',
   },
   {
     icon: Cpu,
