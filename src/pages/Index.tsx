@@ -140,6 +140,44 @@ export default function Index() {
       });
 
       if (error) throw error;
+
+      // Also save the basic routine to generated_routines for the Routines tab
+      const amSteps = analysisData.routine.filter(s => s.time === 'AM' || s.time === 'BOTH');
+      const pmSteps = analysisData.routine.filter(s => s.time === 'PM' || s.time === 'BOTH');
+      
+      const morningRoutine = amSteps.map((step, idx) => ({
+        step: idx + 1,
+        productType: 'Product',
+        productName: step.product,
+        frequency: 'Daily',
+        howToUse: step.reason,
+        reason: step.reason,
+        productLink: step.productLink,
+      }));
+      
+      const eveningRoutine = pmSteps.map((step, idx) => ({
+        step: idx + 1,
+        productType: 'Product',
+        productName: step.product,
+        frequency: 'Daily',
+        howToUse: step.reason,
+        reason: step.reason,
+        productLink: step.productLink,
+      }));
+
+      await supabase.from('generated_routines').insert({
+        user_id: user.id,
+        routine_type: 'basic',
+        intensity: formData?.analysisTier || 'basic',
+        routine_title: `${formData?.analysisTier?.charAt(0).toUpperCase()}${formData?.analysisTier?.slice(1)} Scan Routine`,
+        routine_summary: `Generated from your ${formData?.analysisTier || 'basic'} skin analysis`,
+        morning_routine: morningRoutine,
+        evening_routine: eveningRoutine,
+        tips: ['Apply thinnest to thickest consistency', 'Wait 1-2 minutes between actives'],
+        skin_type: formData?.skinType,
+        concerns: formData?.concerns,
+        score: analysisData.score,
+      });
     } catch (err) {
       console.error('Failed to save analysis:', err);
     }

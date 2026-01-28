@@ -14,11 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_coach_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_coach_usage: {
         Row: {
           created_at: string
           id: string
-          questions_used: number
+          tokens_used: number
           updated_at: string
           usage_date: string
           user_id: string
@@ -26,7 +53,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          questions_used?: number
+          tokens_used?: number
           updated_at?: string
           usage_date?: string
           user_id: string
@@ -34,7 +61,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          questions_used?: number
+          tokens_used?: number
           updated_at?: string
           usage_date?: string
           user_id?: string
@@ -126,6 +153,7 @@ export type Database = {
         Row: {
           concerns: string[] | null
           created_at: string
+          custom_name: string | null
           evening_routine: Json | null
           id: string
           intensity: string | null
@@ -142,6 +170,7 @@ export type Database = {
         Insert: {
           concerns?: string[] | null
           created_at?: string
+          custom_name?: string | null
           evening_routine?: Json | null
           id?: string
           intensity?: string | null
@@ -158,6 +187,7 @@ export type Database = {
         Update: {
           concerns?: string[] | null
           created_at?: string
+          custom_name?: string | null
           evening_routine?: Json | null
           id?: string
           intensity?: string | null

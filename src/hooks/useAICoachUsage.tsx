@@ -3,19 +3,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useSubscription } from './useSubscription';
 
-const FREE_DAILY_LIMIT = 5;
+const FREE_DAILY_TOKENS = 1000;
 
 export function useAICoachUsage() {
   const { user } = useAuth();
   const { isPremium } = useSubscription();
-  const [questionsUsed, setQuestionsUsed] = useState(0);
+  const [tokensUsed, setTokensUsed] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       fetchTodayUsage();
     } else {
-      setQuestionsUsed(0);
+      setTokensUsed(0);
       setLoading(false);
     }
   }, [user]);
@@ -28,7 +28,7 @@ export function useAICoachUsage() {
 
       const { data, error } = await supabase
         .from('ai_coach_usage')
-        .select('questions_used')
+        .select('tokens_used')
         .eq('user_id', user.id)
         .eq('usage_date', today)
         .maybeSingle();
@@ -38,7 +38,7 @@ export function useAICoachUsage() {
         return;
       }
 
-      setQuestionsUsed(data?.questions_used || 0);
+      setTokensUsed(data?.tokens_used || 0);
     } catch (error) {
       console.error('Error fetching AI coach usage:', error);
     } finally {
@@ -46,7 +46,7 @@ export function useAICoachUsage() {
     }
   };
 
-  const incrementUsage = async () => {
+  const addTokens = async (tokens: number) => {
     if (!user || isPremium) return;
 
     try {
@@ -55,7 +55,7 @@ export function useAICoachUsage() {
       // Try to upsert the usage record
       const { data: existing } = await supabase
         .from('ai_coach_usage')
-        .select('id, questions_used')
+        .select('id, tokens_used')
         .eq('user_id', user.id)
         .eq('usage_date', today)
         .maybeSingle();
@@ -64,10 +64,10 @@ export function useAICoachUsage() {
         // Update existing record
         await supabase
           .from('ai_coach_usage')
-          .update({ questions_used: existing.questions_used + 1 })
+          .update({ tokens_used: existing.tokens_used + tokens })
           .eq('id', existing.id);
 
-        setQuestionsUsed(existing.questions_used + 1);
+        setTokensUsed(existing.tokens_used + tokens);
       } else {
         // Insert new record
         await supabase
@@ -75,26 +75,34 @@ export function useAICoachUsage() {
           .insert({
             user_id: user.id,
             usage_date: today,
-            questions_used: 1,
+            tokens_used: tokens,
           });
 
-        setQuestionsUsed(1);
+        setTokensUsed(tokens);
       }
     } catch (error) {
-      console.error('Failed to increment AI coach usage:', error);
+      console.error('Failed to update AI coach usage:', error);
     }
   };
 
-  const questionsRemaining = isPremium ? Infinity : Math.max(0, FREE_DAILY_LIMIT - questionsUsed);
-  const canAsk = isPremium || questionsRemaining > 0;
+  const tokensRemaining = isPremium ? Infinity : Math.max(0, FREE_DAILY_TOKENS - tokensUsed);
+  const canAsk = isPremium || tokensRemaining > 0;
+
+  // Estimate tokens for a message (rough approximation: ~4 chars per token)
+  const estimateTokens = (message: string) => {
+    const baseTokens = 200; // Base cost for any question
+    const messageTokens = Math.ceil(message.length / 4);
+    return baseTokens + messageTokens;
+  };
 
   return {
-    questionsUsed,
-    questionsRemaining,
+    tokensUsed,
+    tokensRemaining,
     canAsk,
-    incrementUsage,
+    addTokens,
+    estimateTokens,
     loading,
-    dailyLimit: FREE_DAILY_LIMIT,
+    dailyLimit: FREE_DAILY_TOKENS,
     isPremium,
     refetch: fetchTodayUsage,
   };
