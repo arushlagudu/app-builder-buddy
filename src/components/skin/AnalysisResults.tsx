@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
-import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink, Sparkles, Crown, Lock, Info, DollarSign } from 'lucide-react';
+import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink, Sparkles, Crown, Lock, Info, DollarSign, TrendingDown } from 'lucide-react';
 import { ScoreGauge } from './ScoreGauge';
 import { RoutineGenerator } from './RoutineGenerator';
 import { IngredientGlossary } from './IngredientGlossary';
+import { DupeFinder } from './DupeFinder';
 
 interface Problem {
   title: string;
@@ -63,6 +64,7 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
     reason: string;
     type: 'avoid' | 'prescription';
   } | null>(null);
+  const [dupeProduct, setDupeProduct] = useState<string | null>(null);
 
   const handleRoutineClick = () => {
     if (!isPremium && onUpgradeClick) {
@@ -223,6 +225,18 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-sm font-medium flex-1">{step.product}</span>
                         <div className="flex items-center gap-2">
+                          {step.price && step.price >= 25 && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDupeProduct(step.product);
+                              }}
+                              className="p-1 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
+                              title="Find cheaper alternatives"
+                            >
+                              <TrendingDown className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                           {step.price && (
                             <span className="text-xs text-muted-foreground">${step.price}</span>
                           )}
@@ -275,6 +289,18 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-sm font-medium flex-1">{step.product}</span>
                         <div className="flex items-center gap-2">
+                          {step.price && step.price >= 25 && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDupeProduct(step.product);
+                              }}
+                              className="p-1 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
+                              title="Find cheaper alternatives"
+                            >
+                              <TrendingDown className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                           {step.price && (
                             <span className="text-xs text-muted-foreground">${step.price}</span>
                           )}
@@ -362,6 +388,15 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
         <Download className="w-5 h-5" />
         Download Clinical Report
       </button>
+
+      {/* Dupe Finder Modal */}
+      <DupeFinder
+        productName={dupeProduct || ''}
+        skinType={skinType}
+        concerns={concerns}
+        isOpen={!!dupeProduct}
+        onClose={() => setDupeProduct(null)}
+      />
     </div>
   );
 }
