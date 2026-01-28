@@ -1,6 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { Camera, Upload, X, Scan, AlertCircle, Info, RefreshCw } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface ImageCaptureProps {
   onImageCapture: (imageData: string) => void;
@@ -98,14 +97,11 @@ const compressImage = (file: File | Blob, maxWidth = 800, quality = 0.7): Promis
 
 export function ImageCapture({ onImageCapture, isScanning, showValidationWarning, onDismissWarning }: ImageCaptureProps) {
   const [image, setImage] = useState<string | null>(null);
-  const [isCameraActive, setIsCameraActive] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
   const [showBlurWarning, setShowBlurWarning] = useState(false);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const processImage = async (imageData: string) => {
     const { isBlurry } = await checkImageClarity(imageData);
@@ -136,57 +132,9 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
     setImage(null);
   };
 
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 800 }, height: { ideal: 600 } }
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setIsCameraActive(true);
-      }
-    } catch (err) {
-      console.error('Camera access denied:', err);
-      // Fallback to file upload
-      fileInputRef.current?.click();
-    }
-  };
-
-  const capturePhoto = useCallback(async () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      
-      // Limit canvas size
-      const maxWidth = 800;
-      let width = video.videoWidth;
-      let height = video.videoHeight;
-      
-      if (width > maxWidth) {
-        height = (height * maxWidth) / width;
-        width = maxWidth;
-      }
-      
-      canvas.width = width;
-      canvas.height = height;
-      
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(video, 0, 0, width, height);
-        const imageData = canvas.toDataURL('image/jpeg', 0.7);
-        stopCamera();
-        await processImage(imageData);
-      }
-    }
-  }, [onImageCapture]);
-
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    setIsCameraActive(false);
+  const openNativeCamera = () => {
+    // On mobile, this opens the native camera app directly
+    cameraInputRef.current?.click();
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -207,13 +155,14 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
         reader.readAsDataURL(file);
       } finally {
         setIsCompressing(false);
+        // Reset input so same file can be selected again
+        e.target.value = '';
       }
     }
   };
 
   const clearImage = () => {
     setImage(null);
-    stopCamera();
   };
 
   return (
@@ -280,50 +229,13 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
       )}
 
       <div className="glass-card overflow-hidden">
-        {/* Image/Camera Preview Area */}
+        {/* Image Preview Area */}
         <div className="relative aspect-[3/4] bg-obsidian-light flex items-center justify-center overflow-hidden rounded-t-2xl">
           {isCompressing ? (
             <div className="text-center p-6">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
               <p className="text-muted-foreground text-sm">Processing image...</p>
             </div>
-          ) : isCameraActive ? (
-            <>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-              />
-              <canvas ref={canvasRef} className="hidden" />
-              
-              {/* Camera overlay */}
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-primary rounded-tl-xl" />
-                <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-primary rounded-tr-xl" />
-                <div className="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-primary rounded-bl-xl" />
-                <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-primary rounded-br-xl" />
-              </div>
-              
-              {/* Capture button */}
-              <div className="absolute bottom-6 left-0 right-0 flex justify-center">
-                <button
-                  onClick={capturePhoto}
-                  className="w-16 h-16 rounded-full bg-primary flex items-center justify-center glow-cyan btn-shine"
-                >
-                  <div className="w-14 h-14 rounded-full border-4 border-primary-foreground" />
-                </button>
-              </div>
-              
-              {/* Cancel button */}
-              <button
-                onClick={stopCamera}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-muted/80 flex items-center justify-center"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </>
           ) : image ? (
             <>
               <img src={image} alt="Captured face" className="w-full h-full object-cover" />
@@ -382,10 +294,10 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
         </div>
 
         {/* Action buttons */}
-        {!isCameraActive && !image && !isCompressing && (
+        {!image && !isCompressing && (
           <div className="p-4 flex gap-3">
             <button
-              onClick={startCamera}
+              onClick={openNativeCamera}
               className="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-foreground font-medium flex items-center justify-center gap-2 glow-cyan btn-shine"
             >
               <Camera className="w-5 h-5" />
@@ -402,8 +314,18 @@ export function ImageCapture({ onImageCapture, isScanning, showValidationWarning
         )}
       </div>
 
+      {/* Gallery picker - opens photo library */}
       <input
         ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileUpload}
+        className="hidden"
+      />
+      
+      {/* Camera capture - opens native camera app on mobile */}
+      <input
+        ref={cameraInputRef}
         type="file"
         accept="image/*"
         capture="user"
