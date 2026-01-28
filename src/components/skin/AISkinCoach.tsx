@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Sun, Cloud, Wind, Droplet, RefreshCw, Crown, Send, Loader2, Trash2, Sparkles } from 'lucide-react';
+import { Bot, Crown, Send, Loader2, Trash2, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAICoachUsage } from '@/hooks/useAICoachUsage';
@@ -390,27 +390,6 @@ export function AISkinCoach({
         )}
       </div>
 
-      {/* Today's Conditions */}
-      <div className="glass-card p-3 mt-4">
-        <h4 className="font-medium text-xs mb-2">Today's Conditions</h4>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Sun className="w-4 h-4 mx-auto text-yellow-400 mb-1" />
-            <p className="text-[10px] text-muted-foreground">UV</p>
-            <p className="text-xs font-medium">Moderate</p>
-          </div>
-          <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Droplet className="w-4 h-4 mx-auto text-blue-400 mb-1" />
-            <p className="text-[10px] text-muted-foreground">Humidity</p>
-            <p className="text-xs font-medium">45%</p>
-          </div>
-          <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Wind className="w-4 h-4 mx-auto text-cyan-400 mb-1" />
-            <p className="text-[10px] text-muted-foreground">Air</p>
-            <p className="text-xs font-medium">Good</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

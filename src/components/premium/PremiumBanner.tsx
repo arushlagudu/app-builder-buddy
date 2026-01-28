@@ -6,7 +6,7 @@ interface PremiumBannerProps {
 }
 
 export function PremiumBanner({ onUpgrade }: PremiumBannerProps) {
-  const { isPremium, scansRemaining, getDaysUntilReset } = useSubscription();
+  const { isPremium, tokensRemaining, getDaysUntilReset, TOTAL_TOKENS, SCAN_TOKEN_COST } = useSubscription();
 
   if (isPremium) return null;
 
@@ -20,6 +20,8 @@ export function PremiumBanner({ onUpgrade }: PremiumBannerProps) {
     { icon: TrendingUp, text: 'Trend Analytics' },
   ];
 
+  const canDoScan = tokensRemaining >= SCAN_TOKEN_COST;
+
   return (
     <div className="glass-card p-4 border border-secondary/30 bg-gradient-to-br from-secondary/10 to-primary/5">
       <div className="flex items-center gap-2 mb-3">
@@ -29,12 +31,12 @@ export function PremiumBanner({ onUpgrade }: PremiumBannerProps) {
 
       <div className="mb-4">
         <p className="text-sm text-muted-foreground">
-          {scansRemaining > 0 ? (
+          {canDoScan ? (
             <>
-              <span className="text-foreground font-medium">{scansRemaining} free scan{scansRemaining !== 1 ? 's' : ''}</span> remaining this month
+              <span className="text-foreground font-medium">{tokensRemaining.toLocaleString()}</span> tokens remaining • Resets in <span className="text-foreground font-medium">{getDaysUntilReset()} days</span>
             </>
           ) : (
-            <>No scans remaining. Resets in <span className="text-foreground font-medium">{getDaysUntilReset()} days</span></>
+            <>Not enough tokens for a scan. Resets in <span className="text-foreground font-medium">{getDaysUntilReset()} days</span></>
           )}
         </p>
       </div>
