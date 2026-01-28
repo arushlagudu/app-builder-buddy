@@ -317,44 +317,6 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
             </div>
           )}
 
-          {/* PM Routine */}
-          <div className="glass-card p-4">
-            <h4 className="text-sm font-semibold text-secondary mb-4 flex items-center gap-2">
-              🌙 Evening Routine
-            </h4>
-            <div className="relative pl-6 border-l-2 border-secondary/30 space-y-4">
-              {pmRoutine.map((step, index) => (
-                <div key={index} className="relative timeline-node">
-                  <button
-                    onClick={() => setExpandedStep(expandedStep === step.step + 100 ? null : step.step + 100)}
-                    className="w-full text-left"
-                  >
-                    <div className="ml-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{step.product}</span>
-                        {step.productLink && (
-                          <a
-                            href={step.productLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-secondary hover:text-secondary/80"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
-                        )}
-                      </div>
-                      {expandedStep === step.step + 100 && (
-                        <p className="text-xs text-muted-foreground mt-2 animate-fade-in bg-muted/30 p-2 rounded-lg">
-                          {step.reason}
-                        </p>
-                      )}
-                    </div>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 

@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.generate-routine]
 verify_jwt = false
+
+[functions.ai-coach-chat]
+verify_jwt = false
