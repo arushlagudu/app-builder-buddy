@@ -168,8 +168,8 @@ export function RoutineHistory() {
 
   // Full routine view
   if (selectedRoutine) {
-    const IntensityIcon = selectedRoutine.intensity ? intensityIcons[selectedRoutine.intensity as keyof typeof intensityIcons] : Leaf;
-    const intensityColor = selectedRoutine.intensity ? intensityColors[selectedRoutine.intensity as keyof typeof intensityColors] : 'text-primary';
+    const IntensityIcon = (selectedRoutine.intensity && intensityIcons[selectedRoutine.intensity as keyof typeof intensityIcons]) || Leaf;
+    const intensityColor = (selectedRoutine.intensity && intensityColors[selectedRoutine.intensity as keyof typeof intensityColors]) || 'text-primary';
 
     return (
       <div className="space-y-4 animate-fade-in">
@@ -370,7 +370,7 @@ export function RoutineHistory() {
       
       {routines.map((routine, index) => {
         const IntensityIcon = (routine.intensity && intensityIcons[routine.intensity as keyof typeof intensityIcons]) || Leaf;
-        const intensityColor = routine.intensity ? intensityColors[routine.intensity as keyof typeof intensityColors] : 'text-primary';
+        const intensityColor = (routine.intensity && intensityColors[routine.intensity as keyof typeof intensityColors]) || 'text-primary';
         const isEditing = editingId === routine.id;
 
         return (
