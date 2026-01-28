@@ -5,32 +5,59 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const getBudgetGuidelines = (budget: string) => {
+  switch (budget) {
+    case 'budget':
+      return `BUDGET TIER (Drugstore/Affordable):
+- Recommend affordable drugstore brands: CeraVe, The Ordinary, Cetaphil, Neutrogena, La Roche-Posay (drugstore line), Vanicream, Aveeno
+- Keep total routine cost under $50
+- Focus on multi-purpose products when possible`;
+    case 'luxury':
+      return `LUXURY TIER (Premium):
+- Recommend high-end brands: SkinCeuticals, Drunk Elephant, Sunday Riley, Tatcha, Dr. Dennis Gross, iS Clinical
+- Prioritize advanced formulations and elegant textures
+- Premium ingredients and sophisticated delivery systems`;
+    case 'mid':
+    default:
+      return `MID-RANGE TIER:
+- Recommend quality brands: Paula's Choice, Good Molecules, Versed, Inkey List, First Aid Beauty, Glow Recipe
+- Balance between efficacy and value
+- Quality actives at reasonable prices`;
+  }
+};
+
 const systemPrompt = `You are a Senior Cosmetic Chemist and Board-Certified Dermatologist. Analyze skin images and provide clinical assessments.
+
+IMPORTANT: Keep the routine SIMPLE and PRACTICAL (3-4 steps per routine max for free analysis).
 
 When analyzing a user's skin, provide:
 
-1. CORE PROBLEMS: Diagnose 3 physiological causes with biological mechanisms.
+1. CORE PROBLEMS: Diagnose 2-3 physiological causes with brief explanations.
 
-2. SKIN HEALTH SCORE (1-10): Deduct points for inflammation, barrier damage, dehydration, breakouts, hyperpigmentation.
+2. SKIN HEALTH SCORE (1-10): Based on overall skin condition.
 
-3. DEEP ANALYSIS: Explain using terms like TEWL, sebum oxidation, glycation, melanin dysregulation.
+3. DEEP ANALYSIS: Brief explanation of what's happening with their skin (2-3 sentences).
 
 4. INGREDIENT FILTERING:
-   - AVOID: Surfactants, alcohols, fragrances that trigger the user's skin
-   - PRESCRIPTION: Active chemicals with mechanisms
+   - AVOID: 3-4 ingredients to avoid
+   - PRESCRIPTION: 3-4 beneficial ingredients
 
-5. ROUTINE: AM/PM with pH-correct ordering and real product recommendations.
+5. ROUTINE: KEEP IT SIMPLE!
+   - AM: 3-4 steps max (cleanser, treatment/serum, moisturizer, SPF)
+   - PM: 3-4 steps max (cleanser, treatment, moisturizer)
+   - NO lip products, NO separate eye creams for basic routine
+   - One active treatment per routine
 
 Respond ONLY with valid JSON:
 {
   "score": 7.5,
   "problems": [
-    {"title": "Problem Name", "description": "Clinical explanation", "icon": "hydration|inflammation|barrier"}
+    {"title": "Problem Name", "description": "Brief explanation", "icon": "hydration|inflammation|barrier"}
   ],
-  "deepAnalysis": "Biological explanation...",
+  "deepAnalysis": "Brief biological explanation...",
   "avoidIngredients": [{"name": "Ingredient", "reason": "Why to avoid"}],
   "prescriptionIngredients": [{"name": "Ingredient", "reason": "Mechanism"}],
-  "routine": [{"time": "AM|PM|BOTH", "step": 1, "product": "Product by Brand", "reason": "Rationale"}]
+  "routine": [{"time": "AM|PM", "step": 1, "product": "Product by Brand", "reason": "Brief rationale"}]
 }`;
 
 serve(async (req) => {
@@ -42,9 +69,9 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { image, skinType, concerns, climate, pollution } = body;
+    const { image, skinType, concerns, climate, pollution, budget } = body;
     
-    console.log("Received request with skinType:", skinType, "concerns:", concerns);
+    console.log("Received request with skinType:", skinType, "concerns:", concerns, "budget:", budget);
     
     if (!image) {
       console.error("No image provided");
@@ -72,13 +99,18 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    const budgetGuidelines = getBudgetGuidelines(budget || 'mid');
+
     const userPrompt = `Analyze this skin image:
 - Skin Type: ${skinType || 'unknown'}
 - Concerns: ${concerns?.join(", ") || 'general'}
 - Climate: ${climate || 'temperate'}
 - Pollution: ${pollution || 'moderate'}
 
-Provide health score, 3 core problems, deep analysis, avoid/prescription ingredients, and AM/PM routine with real products. Return ONLY valid JSON.`;
+${budgetGuidelines}
+
+IMPORTANT: Keep the routine SIMPLE - max 3-4 products for AM and 3-4 for PM. No lip products or extras.
+Provide health score, 2-3 core problems, brief analysis, avoid/prescription ingredients, and a SIMPLE AM/PM routine matching the budget tier. Return ONLY valid JSON.`;
 
     console.log("Calling AI gateway...");
     
