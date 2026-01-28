@@ -144,6 +144,13 @@ export default function Index() {
   };
 
   const handleStartAnalysis = async () => {
+    // Require authentication for scanning
+    if (!user) {
+      toast.error('Please sign in to analyze your skin');
+      setShowAuthModal(true);
+      return;
+    }
+
     if (!isFormValid) {
       setShowValidationWarning(true);
       toast.error('Please complete the skin profile form above');
