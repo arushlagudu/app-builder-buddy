@@ -369,7 +369,7 @@ export function RoutineHistory() {
       <h2 className="text-lg font-semibold px-1">Your Routines</h2>
       
       {routines.map((routine, index) => {
-        const IntensityIcon = routine.intensity ? intensityIcons[routine.intensity as keyof typeof intensityIcons] : Leaf;
+        const IntensityIcon = (routine.intensity && intensityIcons[routine.intensity as keyof typeof intensityIcons]) || Leaf;
         const intensityColor = routine.intensity ? intensityColors[routine.intensity as keyof typeof intensityColors] : 'text-primary';
         const isEditing = editingId === routine.id;
 
