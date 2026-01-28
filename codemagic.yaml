@@ -45,22 +45,42 @@ workflows:
       - name: Sync Capacitor
         script: |
           npx cap copy ios
-      - name: Install CocoaPods dependencies
+      - name: Install dependencies (CocoaPods or SPM)
         script: |
           cd ios/App
           ls -la
-          cat Podfile || echo "No Podfile found!"
-          pod install --repo-update
+          if [ -f "Podfile" ]; then
+            echo "Using CocoaPods..."
+            pod install --repo-update
+          else
+            echo "No Podfile found - using Swift Package Manager (default in Capacitor 8)"
+            echo "SPM dependencies will be resolved during xcodebuild"
+          fi
       - name: Build iOS app
         script: |
           cd ios/App
-          xcodebuild -workspace "App.xcworkspace" \
-            -scheme "App" \
-            -configuration Release \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGNING_ALLOWED=NO \
-            clean build
+          # Check if workspace exists (CocoaPods) or use project (SPM)
+          if [ -d "App.xcworkspace" ]; then
+            echo "Building with workspace..."
+            xcodebuild -workspace "App.xcworkspace" \
+              -scheme "App" \
+              -configuration Release \
+              -sdk iphoneos \
+              -destination 'generic/platform=iOS' \
+              CODE_SIGNING_ALLOWED=NO \
+              -clonedSourcePackagesDirPath ../spm-cache \
+              clean build
+          else
+            echo "Building with project (SPM mode)..."
+            xcodebuild -project "App.xcodeproj" \
+              -scheme "App" \
+              -configuration Release \
+              -sdk iphoneos \
+              -destination 'generic/platform=iOS' \
+              CODE_SIGNING_ALLOWED=NO \
+              -clonedSourcePackagesDirPath ../spm-cache \
+              clean build
+          fi
     artifacts:
       - ios/App/build/**/*.app
       - ios/App/build/**/*.ipa
