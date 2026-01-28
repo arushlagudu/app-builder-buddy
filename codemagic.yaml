@@ -29,8 +29,7 @@ workflows:
       - name: Create iOS platform
         script: |
           echo "Creating iOS platform..."
-          # Use --skip-pod-install flag if available, otherwise set env var
-          npx cap add ios --skip-pod-install 2>&1 || {
+          npx cap add ios 2>&1 || {
             echo "cap add ios failed, checking if ios folder exists anyway..."
             if [ -d "ios" ]; then
               echo "ios folder exists despite error"
@@ -45,7 +44,7 @@ workflows:
           ls -la ios/App/ || echo "No ios/App folder"
       - name: Sync Capacitor
         script: |
-          npx cap sync ios --skip-pod-install 2>&1 || npx cap copy ios
+          npx cap copy ios
       - name: Install CocoaPods dependencies
         script: |
           cd ios/App
