@@ -13,20 +13,32 @@ workflows:
       - name: Install npm dependencies
         script: |
           npm install
-      - name: Install Capacitor iOS
+      - name: Install Capacitor platforms
         script: |
-          npm install @capacitor/ios
+          npm install @capacitor/ios @capacitor/android
       - name: Build web assets
         script: |
           npm run build
-      - name: Add iOS platform
+          echo "Build complete, checking dist folder:"
+          ls -la dist || echo "dist folder not found!"
+      - name: Initialize iOS platform
         script: |
-          npx cap add ios
+          echo "Current directory:"
+          pwd
+          echo "Capacitor config:"
+          cat capacitor.config.ts
+          echo "Running cap add ios..."
+          npx cap add ios 2>&1 || echo "cap add ios returned error"
+          echo "Checking for ios folder..."
           ls -la
-          ls -la ios/App || echo "ios/App not found"
-      - name: Update iOS platform
-        script: |
-          npx cap update ios
+          if [ -d "ios" ]; then
+            echo "ios folder exists:"
+            ls -la ios/
+            ls -la ios/App/ || echo "ios/App not found"
+          else
+            echo "ERROR: ios folder was not created!"
+            exit 1
+          fi
       - name: Sync Capacitor
         script: |
           npx cap sync ios
