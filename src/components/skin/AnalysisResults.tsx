@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink, Sparkles, Crown, Lock, Info } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, ExternalLink, Sparkles, Crown, Lock, Info, DollarSign } from 'lucide-react';
 import { ScoreGauge } from './ScoreGauge';
 import { RoutineGenerator } from './RoutineGenerator';
 import { IngredientGlossary } from './IngredientGlossary';
@@ -21,6 +21,7 @@ interface RoutineStep {
   product: string;
   productLink?: string;
   reason: string;
+  price?: number;
 }
 
 interface AnalysisData {
@@ -73,6 +74,19 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
 
   const amRoutine = data.routine.filter(s => s.time === 'AM' || s.time === 'BOTH');
   const pmRoutine = data.routine.filter(s => s.time === 'PM' || s.time === 'BOTH');
+
+  // Calculate totals
+  const amTotal = useMemo(() => amRoutine.reduce((sum, step) => sum + (step.price || 0), 0), [amRoutine]);
+  const pmTotal = useMemo(() => pmRoutine.reduce((sum, step) => sum + (step.price || 0), 0), [pmRoutine]);
+  const grandTotal = useMemo(() => {
+    const allProducts = new Set([...amRoutine.map(s => s.product), ...pmRoutine.map(s => s.product)]);
+    let total = 0;
+    allProducts.forEach(product => {
+      const step = data.routine.find(s => s.product === product);
+      total += step?.price || 0;
+    });
+    return total;
+  }, [data.routine, amRoutine, pmRoutine]);
 
   return (
     <div className="space-y-6 pb-24 animate-fade-in">
@@ -187,9 +201,17 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
         <div className="space-y-6">
           {/* AM Routine */}
           <div className="glass-card p-4">
-            <h4 className="text-sm font-semibold text-primary mb-4 flex items-center gap-2">
-              ☀️ Morning Routine
-            </h4>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-semibold text-primary flex items-center gap-2">
+                ☀️ Morning Routine
+              </h4>
+              {amTotal > 0 && (
+                <span className="text-xs text-primary flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-lg">
+                  <DollarSign className="w-3 h-3" />
+                  ~${amTotal}
+                </span>
+              )}
+            </div>
             <div className="relative pl-6 border-l-2 border-primary/30 space-y-4">
               {amRoutine.map((step, index) => (
                 <div key={index} className="relative timeline-node">
@@ -198,19 +220,24 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
                     className="w-full text-left"
                   >
                     <div className="ml-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{step.product}</span>
-                        {step.productLink && (
-                          <a
-                            href={step.productLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-primary hover:text-primary/80"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
-                        )}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-medium flex-1">{step.product}</span>
+                        <div className="flex items-center gap-2">
+                          {step.price && (
+                            <span className="text-xs text-muted-foreground">${step.price}</span>
+                          )}
+                          {step.productLink && (
+                            <a
+                              href={step.productLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-primary hover:text-primary/80"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          )}
+                        </div>
                       </div>
                       {expandedStep === step.step && (
                         <p className="text-xs text-muted-foreground mt-2 animate-fade-in bg-muted/30 p-2 rounded-lg">
@@ -223,6 +250,72 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
               ))}
             </div>
           </div>
+
+          {/* PM Routine */}
+          <div className="glass-card p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-semibold text-secondary flex items-center gap-2">
+                🌙 Evening Routine
+              </h4>
+              {pmTotal > 0 && (
+                <span className="text-xs text-secondary flex items-center gap-1 bg-secondary/10 px-2 py-1 rounded-lg">
+                  <DollarSign className="w-3 h-3" />
+                  ~${pmTotal}
+                </span>
+              )}
+            </div>
+            <div className="relative pl-6 border-l-2 border-secondary/30 space-y-4">
+              {pmRoutine.map((step, index) => (
+                <div key={index} className="relative timeline-node">
+                  <button
+                    onClick={() => setExpandedStep(expandedStep === step.step + 100 ? null : step.step + 100)}
+                    className="w-full text-left"
+                  >
+                    <div className="ml-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-medium flex-1">{step.product}</span>
+                        <div className="flex items-center gap-2">
+                          {step.price && (
+                            <span className="text-xs text-muted-foreground">${step.price}</span>
+                          )}
+                          {step.productLink && (
+                            <a
+                              href={step.productLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-secondary hover:text-secondary/80"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                      {expandedStep === step.step + 100 && (
+                        <p className="text-xs text-muted-foreground mt-2 animate-fade-in bg-muted/30 p-2 rounded-lg">
+                          {step.reason}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Total Cost */}
+          {grandTotal > 0 && (
+            <div className="glass-card p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-foreground">Estimated Total Routine Cost</span>
+                <span className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent flex items-center gap-1">
+                  <DollarSign className="w-4 h-4 text-primary" />
+                  ~${grandTotal}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Some products may be used in both routines</p>
+            </div>
+          )}
 
           {/* PM Routine */}
           <div className="glass-card p-4">
@@ -284,7 +377,7 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
             ) : (
               <Crown className="w-5 h-5" />
             )}
-            Customized Personalized Routine with Instructions
+            <span className="text-sm sm:text-base">In-Depth Premium Analysis with Personalized Routine</span>
             {!isPremium && <Lock className="w-4 h-4 ml-1" />}
           </button>
         ) : (

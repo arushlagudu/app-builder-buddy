@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Droplet, Sun, Wind, Sparkles, AlertTriangle, Clock, DollarSign } from 'lucide-react';
+import { Droplet, Sun, Wind, Sparkles, AlertTriangle, Clock, DollarSign, Lock, Crown, Zap } from 'lucide-react';
 
 interface SkinFormData {
   skinType: string;
@@ -7,11 +7,14 @@ interface SkinFormData {
   climate: string;
   pollution: string;
   budget: string;
+  analysisTier: 'basic' | 'advanced' | 'premium';
 }
 
 interface SkinFormProps {
   onSubmit: (data: SkinFormData) => void;
   isValid: boolean;
+  isPremium?: boolean;
+  onUpgradeClick?: () => void;
 }
 
 const skinTypes = [
@@ -49,13 +52,20 @@ const budgetLevels = [
   { id: 'luxury', label: '👑 Luxury', description: 'Premium products' },
 ];
 
-export function SkinForm({ onSubmit, isValid }: SkinFormProps) {
+const analysisTiers = [
+  { id: 'basic', label: 'Basic', icon: Zap, description: '3-4 steps', locked: false },
+  { id: 'advanced', label: 'Advanced', icon: Sparkles, description: '4-5 steps', locked: false },
+  { id: 'premium', label: 'Premium', icon: Crown, description: 'Full routine + deep analysis', locked: true },
+];
+
+export function SkinForm({ onSubmit, isValid, isPremium = false, onUpgradeClick }: SkinFormProps) {
   const [formData, setFormData] = useState<SkinFormData>({
     skinType: '',
     concerns: [],
     climate: '',
     pollution: '',
     budget: '',
+    analysisTier: 'basic',
   });
 
   const handleSkinTypeSelect = (type: string) => {
@@ -87,6 +97,16 @@ export function SkinForm({ onSubmit, isValid }: SkinFormProps) {
 
   const handleBudgetSelect = (budget: string) => {
     const newData = { ...formData, budget };
+    setFormData(newData);
+    onSubmit(newData);
+  };
+
+  const handleTierSelect = (tier: 'basic' | 'advanced' | 'premium') => {
+    if (tier === 'premium' && !isPremium) {
+      onUpgradeClick?.();
+      return;
+    }
+    const newData = { ...formData, analysisTier: tier };
     setFormData(newData);
     onSubmit(newData);
   };
@@ -165,6 +185,55 @@ export function SkinForm({ onSubmit, isValid }: SkinFormProps) {
               <span className="text-[10px] text-muted-foreground text-center">{description}</span>
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Analysis Tier */}
+      <div className="glass-card p-5">
+        <h3 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-secondary" />
+          Analysis Depth
+        </h3>
+        <div className="grid grid-cols-3 gap-2">
+          {analysisTiers.map(({ id, label, icon: Icon, description, locked }) => {
+            const isLocked = locked && !isPremium;
+            return (
+              <button
+                key={id}
+                onClick={() => handleTierSelect(id as 'basic' | 'advanced' | 'premium')}
+                className={`p-3 rounded-xl border transition-all duration-300 flex flex-col items-center gap-1 relative ${
+                  formData.analysisTier === id && !isLocked
+                    ? 'border-secondary bg-secondary/10 glow-violet'
+                    : isLocked
+                    ? 'border-border bg-muted/20 opacity-75'
+                    : 'border-border bg-muted/30 hover:border-secondary/50'
+                }`}
+              >
+                {isLocked && (
+                  <div className="absolute top-1 right-1">
+                    <Lock className="w-3 h-3 text-muted-foreground" />
+                  </div>
+                )}
+                <Icon className={`w-4 h-4 ${
+                  formData.analysisTier === id && !isLocked 
+                    ? 'text-secondary' 
+                    : isLocked 
+                    ? 'text-muted-foreground' 
+                    : 'text-foreground'
+                }`} />
+                <span className={`text-xs font-medium ${
+                  formData.analysisTier === id && !isLocked 
+                    ? 'text-secondary' 
+                    : isLocked 
+                    ? 'text-muted-foreground' 
+                    : 'text-foreground'
+                }`}>
+                  {label}
+                </span>
+                <span className="text-[10px] text-muted-foreground text-center">{description}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

@@ -8,56 +8,89 @@ const corsHeaders = {
 const getBudgetGuidelines = (budget: string) => {
   switch (budget) {
     case 'budget':
-      return `BUDGET TIER (Drugstore/Affordable):
+      return {
+        guidelines: `BUDGET TIER (Drugstore/Affordable):
 - Recommend affordable drugstore brands: CeraVe, The Ordinary, Cetaphil, Neutrogena, La Roche-Posay (drugstore line), Vanicream, Aveeno
 - Keep total routine cost under $50
-- Focus on multi-purpose products when possible`;
+- Focus on multi-purpose products when possible`,
+        priceRange: { min: 5, max: 20 }
+      };
     case 'luxury':
-      return `LUXURY TIER (Premium):
+      return {
+        guidelines: `LUXURY TIER (Premium):
 - Recommend high-end brands: SkinCeuticals, Drunk Elephant, Sunday Riley, Tatcha, Dr. Dennis Gross, iS Clinical
 - Prioritize advanced formulations and elegant textures
-- Premium ingredients and sophisticated delivery systems`;
+- Premium ingredients and sophisticated delivery systems`,
+        priceRange: { min: 40, max: 150 }
+      };
     case 'mid':
     default:
-      return `MID-RANGE TIER:
+      return {
+        guidelines: `MID-RANGE TIER:
 - Recommend quality brands: Paula's Choice, Good Molecules, Versed, Inkey List, First Aid Beauty, Glow Recipe
 - Balance between efficacy and value
-- Quality actives at reasonable prices`;
+- Quality actives at reasonable prices`,
+        priceRange: { min: 15, max: 45 }
+      };
   }
 };
 
-const systemPrompt = `You are a Senior Cosmetic Chemist and Board-Certified Dermatologist. Analyze skin images and provide clinical assessments.
+const getTierGuidelines = (tier: string) => {
+  switch (tier) {
+    case 'basic':
+      return {
+        steps: '3-4',
+        instruction: 'Keep routine SIMPLE with only 3-4 essential steps per routine (cleanser, treatment OR serum, moisturizer, SPF for AM).',
+        deepAnalysis: false
+      };
+    case 'advanced':
+      return {
+        steps: '4-5',
+        instruction: 'Provide a more comprehensive routine with 4-5 steps per routine (cleanser, toner/essence, serum, moisturizer, SPF for AM).',
+        deepAnalysis: false
+      };
+    case 'premium':
+    default:
+      return {
+        steps: '5-7',
+        instruction: 'Provide a full professional routine with 5-7 steps including all necessary actives, treatments, and specialty products.',
+        deepAnalysis: true
+      };
+  }
+};
 
-IMPORTANT: Keep the routine SIMPLE and PRACTICAL (3-4 steps per routine max for free analysis).
+const getSystemPrompt = (tier: { steps: string; instruction: string; deepAnalysis: boolean }) => `You are a Senior Cosmetic Chemist and Board-Certified Dermatologist. Analyze skin images and provide clinical assessments.
+
+ROUTINE COMPLEXITY: ${tier.instruction}
 
 When analyzing a user's skin, provide:
 
-1. CORE PROBLEMS: Diagnose 2-3 physiological causes with brief explanations.
+1. CORE PROBLEMS: Diagnose 2-3 physiological causes with detailed explanations.
 
 2. SKIN HEALTH SCORE (1-10): Based on overall skin condition.
 
-3. DEEP ANALYSIS: Brief explanation of what's happening with their skin (2-3 sentences).
+3. DEEP ANALYSIS: ${tier.deepAnalysis 
+    ? 'Provide an in-depth biological explanation covering skin barrier function, cellular turnover, inflammation markers, and long-term prognosis (4-6 sentences).'
+    : 'Brief explanation of what\'s happening with their skin (2-3 sentences).'}
 
 4. INGREDIENT FILTERING:
-   - AVOID: 3-4 ingredients to avoid
-   - PRESCRIPTION: 3-4 beneficial ingredients
+   - AVOID: 4-5 ingredients to avoid with detailed reasons
+   - PRESCRIPTION: 5-6 beneficial ingredients with scientific mechanisms
 
-5. ROUTINE: KEEP IT SIMPLE!
-   - AM: 3-4 steps max (cleanser, treatment/serum, moisturizer, SPF)
-   - PM: 3-4 steps max (cleanser, treatment, moisturizer)
-   - NO lip products, NO separate eye creams for basic routine
-   - One active treatment per routine
-
+5. ROUTINE: ${tier.steps} steps per routine
+   - Include estimated price for each product in USD
+   - Format product as "Product Name by Brand (~$XX)"
+   
 Respond ONLY with valid JSON:
 {
   "score": 7.5,
   "problems": [
-    {"title": "Problem Name", "description": "Brief explanation", "icon": "hydration|inflammation|barrier"}
+    {"title": "Problem Name", "description": "Detailed explanation of the physiological cause", "icon": "hydration|inflammation|barrier"}
   ],
-  "deepAnalysis": "Brief biological explanation...",
-  "avoidIngredients": [{"name": "Ingredient", "reason": "Why to avoid"}],
-  "prescriptionIngredients": [{"name": "Ingredient", "reason": "Mechanism"}],
-  "routine": [{"time": "AM|PM", "step": 1, "product": "Product by Brand", "reason": "Brief rationale"}]
+  "deepAnalysis": "Biological explanation...",
+  "avoidIngredients": [{"name": "Ingredient", "reason": "Detailed reason why to avoid"}],
+  "prescriptionIngredients": [{"name": "Ingredient", "reason": "Scientific mechanism of action"}],
+  "routine": [{"time": "AM|PM", "step": 1, "product": "Product by Brand (~$XX)", "price": 15, "reason": "Brief rationale"}]
 }`;
 
 serve(async (req) => {
@@ -69,9 +102,9 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { image, skinType, concerns, climate, pollution, budget } = body;
+    const { image, skinType, concerns, climate, pollution, budget, analysisTier } = body;
     
-    console.log("Received request with skinType:", skinType, "concerns:", concerns, "budget:", budget);
+    console.log("Received request with skinType:", skinType, "concerns:", concerns, "budget:", budget, "tier:", analysisTier);
     
     if (!image) {
       console.error("No image provided");
@@ -99,7 +132,9 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const budgetGuidelines = getBudgetGuidelines(budget || 'mid');
+    const budgetInfo = getBudgetGuidelines(budget || 'mid');
+    const tierInfo = getTierGuidelines(analysisTier || 'basic');
+    const systemPrompt = getSystemPrompt(tierInfo);
 
     const userPrompt = `Analyze this skin image:
 - Skin Type: ${skinType || 'unknown'}
@@ -107,10 +142,13 @@ serve(async (req) => {
 - Climate: ${climate || 'temperate'}
 - Pollution: ${pollution || 'moderate'}
 
-${budgetGuidelines}
+${budgetInfo.guidelines}
 
-IMPORTANT: Keep the routine SIMPLE - max 3-4 products for AM and 3-4 for PM. No lip products or extras.
-Provide health score, 2-3 core problems, brief analysis, avoid/prescription ingredients, and a SIMPLE AM/PM routine matching the budget tier. Return ONLY valid JSON.`;
+PRICE GUIDANCE: Products should range from $${budgetInfo.priceRange.min} to $${budgetInfo.priceRange.max} each.
+
+ROUTINE STEPS: Provide exactly ${tierInfo.steps} steps for AM and ${tierInfo.steps} steps for PM.
+
+Provide health score, 2-3 core problems with detailed explanations, ${tierInfo.deepAnalysis ? 'comprehensive' : 'brief'} analysis, avoid/prescription ingredients with scientific rationale, and an AM/PM routine matching the budget tier with price estimates. Return ONLY valid JSON.`;
 
     console.log("Calling AI gateway...");
     
