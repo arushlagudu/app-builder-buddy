@@ -9,9 +9,8 @@ interface Subscription {
   scans_reset_at: string;
 }
 
-const TOTAL_TOKENS = 5000;
-const SCAN_TOKEN_COST = 2500;
-const RESET_INTERVAL_DAYS = 3;
+const FREE_SCAN_LIMIT = 2;
+const RESET_INTERVAL_DAYS = 30;
 
 export function useSubscription() {
   const { user } = useAuth();
@@ -42,13 +41,13 @@ export function useSubscription() {
       }
 
       if (data) {
-        // Check if we need to reset the token count (every 3 days)
+        // Check if we need to reset the scan count
         const resetDate = new Date(data.scans_reset_at);
         const now = new Date();
         const daysSinceReset = Math.floor((now.getTime() - resetDate.getTime()) / (1000 * 60 * 60 * 24));
         
         if (daysSinceReset >= RESET_INTERVAL_DAYS) {
-          // Reset the token count
+          // Reset the scan count
           const { data: updated } = await supabase
             .from('subscriptions')
             .update({ scans_used: 0, scans_reset_at: now.toISOString() })
@@ -69,31 +68,22 @@ export function useSubscription() {
   };
 
   const isPremium = subscription?.status === 'premium';
-  
-  // Token-based system: scans_used now represents tokens used
-  const tokensUsed = subscription?.scans_used || 0;
-  const tokensRemaining = isPremium ? Infinity : Math.max(0, TOTAL_TOKENS - tokensUsed);
-  const canScan = isPremium || tokensRemaining >= SCAN_TOKEN_COST;
+  const scansRemaining = isPremium ? Infinity : Math.max(0, FREE_SCAN_LIMIT - (subscription?.scans_used || 0));
+  const canScan = isPremium || scansRemaining > 0;
 
-  const useTokens = async (amount: number) => {
+  const incrementScanCount = async () => {
     if (!subscription || isPremium) return;
     
     try {
-      const newTokensUsed = subscription.scans_used + amount;
       await supabase
         .from('subscriptions')
-        .update({ scans_used: newTokensUsed })
+        .update({ scans_used: subscription.scans_used + 1 })
         .eq('id', subscription.id);
       
-      setSubscription(prev => prev ? { ...prev, scans_used: newTokensUsed } : null);
+      setSubscription(prev => prev ? { ...prev, scans_used: prev.scans_used + 1 } : null);
     } catch (error) {
-      console.error('Failed to use tokens:', error);
+      console.error('Failed to increment scan count:', error);
     }
-  };
-
-  const incrementScanCount = async () => {
-    // Scan costs 2500 tokens
-    await useTokens(SCAN_TOKEN_COST);
   };
 
   const getDaysUntilReset = () => {
@@ -108,14 +98,10 @@ export function useSubscription() {
     subscription,
     loading,
     isPremium,
-    tokensRemaining,
-    tokensUsed,
+    scansRemaining,
     canScan,
     incrementScanCount,
-    useTokens,
     getDaysUntilReset,
     refetch: fetchSubscription,
-    TOTAL_TOKENS,
-    SCAN_TOKEN_COST,
   };
 }
