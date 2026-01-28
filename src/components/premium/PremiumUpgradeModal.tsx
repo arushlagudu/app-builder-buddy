@@ -157,12 +157,11 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'scan_limit' }:
                 <span className="text-4xl font-bold text-primary">$9.99</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
-              <p className="text-xs text-muted-foreground">Cancel anytime. No hidden fees.</p>
               
-              {/* Money back guarantee */}
+              {/* Dermatologist approved badge */}
               <div className="mt-3 flex items-center justify-center gap-2 text-xs text-primary">
                 <Shield className="w-4 h-4" />
-                <span>30-Day Money-Back Guarantee</span>
+                <span>Dermatologist Approved</span>
               </div>
             </div>
           </div>
