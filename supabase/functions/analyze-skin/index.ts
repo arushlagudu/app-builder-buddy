@@ -75,7 +75,8 @@ When analyzing a user's skin, provide:
 
 4. INGREDIENT FILTERING:
    - AVOID: 4-5 ingredients to avoid with detailed reasons
-   - PRESCRIPTION: 5-6 beneficial ingredients with scientific mechanisms
+   - PRESCRIPTION: 5-6 beneficial chemical/clinical ingredients with scientific mechanisms
+   - NATURAL REMEDIES: 5-6 natural/organic alternatives (herbs, oils, DIY treatments, foods, supplements) that can help their specific skin concerns
 
 5. ROUTINE: ${tier.steps} steps per routine
    - Include estimated price for each product in USD
@@ -90,6 +91,7 @@ Respond ONLY with valid JSON:
   "deepAnalysis": "Biological explanation...",
   "avoidIngredients": [{"name": "Ingredient", "reason": "Detailed reason why to avoid"}],
   "prescriptionIngredients": [{"name": "Ingredient", "reason": "Scientific mechanism of action"}],
+  "naturalRemedies": [{"name": "Natural remedy/ingredient", "reason": "How it helps the skin and how to use it"}],
   "routine": [{"time": "AM|PM", "step": 1, "product": "Product by Brand (~$XX)", "price": 15, "reason": "Brief rationale"}]
 }`;
 
