@@ -206,7 +206,7 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
           <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-3">
             <Crown className="w-6 h-6 text-secondary" />
           </div>
-          <h3 className="font-semibold mb-2">Personalized Routine</h3>
+          <h3 className="font-semibold mb-2">Personalized In-Depth Routine</h3>
           <p className="text-sm text-muted-foreground mb-4">
             Unlock your custom AM/PM skincare routine with product recommendations, pricing, and step-by-step guidance.
           </p>
