@@ -48,8 +48,8 @@ const premiumFeatures = [
   },
   {
     icon: Wand2,
-    title: "Custom Routine with Instructions",
-    description: "Detailed AM/PM routines with exact application steps"
+    title: "Personalized In-Depth Routine",
+    description: "Custom AM/PM routines with intensity levels, ingredient preferences & step-by-step guidance"
   },
   {
     icon: Camera,

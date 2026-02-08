@@ -12,9 +12,9 @@ import {
   Brain,
   Target,
   BarChart3,
-  Microscope,
   Cpu,
-  Eye
+  Eye,
+  Wand2
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -75,9 +75,9 @@ const premiumHighlights = [
     description: 'Advanced AI that understands your unique skin chemistry at a molecular level',
   },
   {
-    icon: Microscope,
-    title: 'Clinical-Grade Precision',
-    description: 'Dermatologist-validated algorithms with 99% accuracy in skin condition detection',
+    icon: Wand2,
+    title: 'Personalized In-Depth Routine',
+    description: 'Custom AM/PM routines with intensity levels, ingredient preferences & step-by-step guidance',
   },
   {
     icon: Cpu,
