@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Calendar, ChevronRight, Sun, Moon, Leaf, Zap, Flame, Clock, ExternalLink, Trash2, Pencil, Check, X } from 'lucide-react';
+import { Calendar, ChevronRight, Sun, Moon, Leaf, Zap, Flame, Clock, ExternalLink, Trash2, Pencil, Check, X, Bell, BellOff, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useReminders } from '@/hooks/useReminders';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -29,6 +30,7 @@ interface SavedRoutine {
   score: number | null;
   created_at: string;
   custom_name: string | null;
+  is_active: boolean;
 }
 
 const intensityIcons = {
@@ -45,6 +47,7 @@ const intensityColors = {
 
 export function RoutineHistory() {
   const { user } = useAuth();
+  const { settings: reminderSettings, enableReminders, disableReminders, updateTimes, isSupported: notificationsSupported } = useReminders();
   const [routines, setRoutines] = useState<SavedRoutine[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRoutine, setSelectedRoutine] = useState<SavedRoutine | null>(null);
@@ -125,6 +128,52 @@ export function RoutineHistory() {
     e.stopPropagation();
     setEditingId(null);
     setEditName('');
+  };
+
+  const setActiveRoutine = async (routineId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      // Deactivate all routines first
+      await supabase
+        .from('generated_routines')
+        .update({ is_active: false } as any)
+        .eq('user_id', user!.id);
+
+      // Activate the selected one
+      await supabase
+        .from('generated_routines')
+        .update({ is_active: true } as any)
+        .eq('id', routineId);
+
+      setRoutines(prev => prev.map(r => ({
+        ...r,
+        is_active: r.id === routineId,
+      })));
+
+      toast.success('Routine set as active! Set up reminders in Settings to get notified.');
+    } catch (error) {
+      console.error('Error setting active routine:', error);
+      toast.error('Failed to set active routine');
+    }
+  };
+
+  const deactivateRoutine = async (routineId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await supabase
+        .from('generated_routines')
+        .update({ is_active: false } as any)
+        .eq('id', routineId);
+
+      setRoutines(prev => prev.map(r => ({
+        ...r,
+        is_active: r.id === routineId ? false : r.is_active,
+      })));
+
+      toast.info('Routine deactivated');
+    } catch (error) {
+      toast.error('Failed to deactivate routine');
+    }
   };
 
   const toggleStep = (key: string) => {
@@ -377,7 +426,9 @@ export function RoutineHistory() {
           <button
             key={routine.id}
             onClick={() => !isEditing && setSelectedRoutine(routine)}
-            className="w-full glass-card p-4 flex items-center gap-3 text-left hover:bg-muted/30 transition-colors"
+            className={`w-full glass-card p-4 flex items-center gap-3 text-left hover:bg-muted/30 transition-colors ${
+              routine.is_active ? 'border border-primary/40 bg-primary/5' : ''
+            }`}
           >
             <div className={`w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 ${intensityColor}`}>
               <IntensityIcon className="w-6 h-6" />
@@ -408,9 +459,17 @@ export function RoutineHistory() {
                 </div>
               ) : (
                 <>
-                  <h3 className="font-medium text-sm truncate">
-                    {getRoutineName(routine, index)}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium text-sm truncate">
+                      {getRoutineName(routine, index)}
+                    </h3>
+                    {routine.is_active && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary font-semibold border border-primary/30 flex items-center gap-1 shrink-0">
+                        <Star className="w-3 h-3" />
+                        Active
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs text-muted-foreground">
                       {format(new Date(routine.created_at), 'MMM d, yyyy • h:mm a')}
@@ -426,6 +485,23 @@ export function RoutineHistory() {
             </div>
             {!isEditing && (
               <div className="flex items-center gap-1">
+                {routine.is_active ? (
+                  <button
+                    onClick={(e) => deactivateRoutine(routine.id, e)}
+                    className="p-2 text-primary hover:text-muted-foreground transition-colors"
+                    title="Deactivate"
+                  >
+                    <BellOff className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => setActiveRoutine(routine.id, e)}
+                    className="p-2 text-muted-foreground hover:text-primary transition-colors"
+                    title="Set as active routine"
+                  >
+                    <Bell className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   onClick={(e) => startEditing(routine, e)}
                   className="p-2 text-muted-foreground hover:text-primary transition-colors"

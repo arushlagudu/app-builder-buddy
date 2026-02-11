@@ -22,8 +22,8 @@ const triggerMessages: Record<string, { title: string; subtitle: string }> = {
     subtitle: "See your skin improve week by week with visual proof"
   },
   scanner: {
-    title: "Know What's In Your Products",
-    subtitle: "Scan any product and know instantly if it's right for you"
+    title: "Unlock Full Scanner Access",
+    subtitle: "Scan products for compatibility and scars for AI-powered treatment plans"
   },
   coach: {
     title: "Your Personal Skin Expert",
@@ -58,8 +58,8 @@ const premiumFeatures = [
   },
   {
     icon: Shield,
-    title: "Product Ingredient Scanner",
-    description: "Scan products to check compatibility with YOUR skin"
+    title: "Product & Scar Scanner",
+    description: "Scan products for compatibility + AI scar identification & treatment"
   },
   {
     icon: Bot,

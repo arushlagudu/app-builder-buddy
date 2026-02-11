@@ -157,6 +157,7 @@ export type Database = {
           evening_routine: Json | null
           id: string
           intensity: string | null
+          is_active: boolean
           morning_routine: Json | null
           routine_summary: string | null
           routine_title: string | null
@@ -174,6 +175,7 @@ export type Database = {
           evening_routine?: Json | null
           id?: string
           intensity?: string | null
+          is_active?: boolean
           morning_routine?: Json | null
           routine_summary?: string | null
           routine_title?: string | null
@@ -191,6 +193,7 @@ export type Database = {
           evening_routine?: Json | null
           id?: string
           intensity?: string | null
+          is_active?: boolean
           morning_routine?: Json | null
           routine_summary?: string | null
           routine_title?: string | null
@@ -328,12 +331,61 @@ export type Database = {
         }
         Relationships: []
       }
+      scar_scans: {
+        Row: {
+          created_at: string
+          detailed_analysis: string | null
+          id: string
+          image_url: string | null
+          natural_remedies: Json | null
+          possible_causes: string[] | null
+          prevention_tips: string[] | null
+          product_recommendations: Json | null
+          removal_timeline: string | null
+          scar_name: string | null
+          scar_type: string | null
+          severity: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detailed_analysis?: string | null
+          id?: string
+          image_url?: string | null
+          natural_remedies?: Json | null
+          possible_causes?: string[] | null
+          prevention_tips?: string[] | null
+          product_recommendations?: Json | null
+          removal_timeline?: string | null
+          scar_name?: string | null
+          scar_type?: string | null
+          severity?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detailed_analysis?: string | null
+          id?: string
+          image_url?: string | null
+          natural_remedies?: Json | null
+          possible_causes?: string[] | null
+          prevention_tips?: string[] | null
+          product_recommendations?: Json | null
+          removal_timeline?: string | null
+          scar_name?: string | null
+          scar_type?: string | null
+          severity?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
           id: string
           scans_reset_at: string
           scans_used: number
+          scar_scans_used: number
           status: string
           updated_at: string
           user_id: string
@@ -343,6 +395,7 @@ export type Database = {
           id?: string
           scans_reset_at?: string
           scans_used?: number
+          scar_scans_used?: number
           status?: string
           updated_at?: string
           user_id: string
@@ -352,6 +405,7 @@ export type Database = {
           id?: string
           scans_reset_at?: string
           scans_used?: number
+          scar_scans_used?: number
           status?: string
           updated_at?: string
           user_id?: string

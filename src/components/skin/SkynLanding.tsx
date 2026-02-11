@@ -41,10 +41,10 @@ const features = [
   },
   {
     icon: Camera,
-    title: 'Product Scanner',
-    description: 'Computer vision ingredient analysis in seconds',
-    premium: true,
-    buzzwords: ['Instant decode', 'Conflict detection', 'Smart matching'],
+    title: 'Product/Scar Scanner',
+    description: 'Ingredient analysis + AI scar identification & treatment',
+    premium: false,
+    buzzwords: ['Instant decode', 'Scar ID', 'Treatment plans'],
   },
   {
     icon: Bot,
