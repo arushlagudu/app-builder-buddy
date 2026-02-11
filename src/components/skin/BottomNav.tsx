@@ -2,6 +2,7 @@ import { Scan, Package, Bot, ListChecks, TrendingUp, Dna, Settings } from 'lucid
 
 type Tab = 'scan' | 'history' | 'progress' | 'scanner' | 'skyn' | 'coach' | 'routines' | 'streaks' | 'settings';
 
+
 interface BottomNavProps {
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
@@ -11,7 +12,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const tabs = [
     { id: 'scan' as Tab, icon: Scan, label: 'Scan' },
     { id: 'routines' as Tab, icon: ListChecks, label: 'Routines' },
-    { id: 'scanner' as Tab, icon: Package, label: 'Product Scanner' },
+    { id: 'scanner' as Tab, icon: Package, label: 'Scanner' },
     { id: 'skyn' as Tab, icon: Dna, label: 'SKYN' },
     { id: 'coach' as Tab, icon: Bot, label: 'AI Coach' },
     { id: 'progress' as Tab, icon: TrendingUp, label: 'Progress Analytics' },

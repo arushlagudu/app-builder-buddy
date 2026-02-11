@@ -14,7 +14,7 @@ export function PremiumBanner({ onUpgrade }: PremiumBannerProps) {
     { icon: Camera, text: 'Unlimited scans' },
     { icon: TrendingUp, text: 'Progress tracking' },
     { icon: Bot, text: 'AI Skin Coach' },
-    { icon: Package, text: 'Product Scanner' },
+    { icon: Package, text: 'Product/Scar Scanner' },
     { icon: Clock, text: 'Analysis History' },
     { icon: ListChecks, text: 'Personalized Routines' },
     { icon: TrendingUp, text: 'Trend Analytics' },
