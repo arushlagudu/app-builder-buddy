@@ -66,15 +66,15 @@ const steps = [
   },
   {
     id: 'scanner',
-    title: 'Scan Your Products',
-    subtitle: 'Find What Works For Your Skin',
-    description: 'Use the Product Scanner to check if your skincare products are compatible with your unique skin profile. Avoid harmful ingredients!',
+    title: 'Product & Scar Scanner',
+    subtitle: 'Analyze Products & Skin Concerns',
+    description: 'Scan product ingredients for compatibility, or zoom in on scars, cuts, and acne spots for AI-powered analysis and treatment recommendations.',
     icon: Camera,
     steps: [
-      'Capture a photo of ingredient labels',
-      'AI analyzes each ingredient',
-      'Get compatibility score & warnings',
-      'Find better alternatives',
+      'Scan ingredient labels for compatibility checks',
+      'Get warnings & find better alternatives',
+      'Use Scar Scanner for zoomed-in skin concerns',
+      'Get treatment plans & natural remedies',
     ],
   },
   {
