@@ -364,52 +364,6 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan, onU
         onGoToCoach={onGoToCoach}
       />
 
-      {/* Premium Spotlight */}
-      <Card 
-        className="border-secondary/30 bg-gradient-to-br from-secondary/5 to-primary/5 overflow-hidden cursor-pointer hover:border-secondary/50 transition-all"
-        onClick={onUpgrade}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/20 border border-secondary/30">
-                <Crown className="w-3.5 h-3.5 text-secondary" />
-                <span className="text-xs font-semibold text-secondary">PREMIUM</span>
-              </div>
-              <span className="text-sm text-muted-foreground">Unlock the full power</span>
-            </div>
-            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-primary/20 text-primary border border-primary/30 animate-pulse">
-              7-DAY FREE TRIAL
-            </span>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-3">
-            {premiumHighlights.map((highlight, idx) => {
-              const Icon = highlight.icon;
-              return (
-                <div
-                  key={idx}
-                  className="p-3 rounded-xl bg-background/50 border border-border/50 space-y-2"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-secondary" />
-                  </div>
-                  <h4 className="text-sm font-semibold leading-tight">{highlight.title}</h4>
-                  <p className="text-xs text-muted-foreground leading-snug">{highlight.description}</p>
-                </div>
-              );
-            })}
-          </div>
-          
-          <div className="mt-4 p-3 rounded-xl bg-secondary/10 border border-secondary/20 text-center">
-            <p className="text-sm text-foreground">
-              <span className="font-bold text-secondary">Start Free Trial</span>
-              <span className="text-muted-foreground"> • Then $9.99/mo</span>
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-1">Unlimited access to all features</p>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Features Grid */}
       <div className="space-y-3">
