@@ -59,7 +59,7 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'scan_limit' }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto p-0 bg-gradient-to-b from-background via-background to-primary/5 border border-primary/20 rounded-3xl shadow-[0_0_60px_rgba(0,245,255,0.15)]">
+      <DialogContent className="max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto p-0 bg-gradient-to-b from-background via-background to-primary/5 border border-primary/20 rounded-3xl shadow-[0_0_50px_hsla(180,45%,55%,0.1)]">
         <button onClick={onClose} className="absolute right-4 top-4 z-50 p-2 rounded-full bg-muted/50 hover:bg-muted transition-colors">
           <X className="w-5 h-5 text-muted-foreground" />
         </button>
