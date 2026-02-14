@@ -13,18 +13,54 @@ const FREE_SCAN_LIMIT = 2;
 const RESET_INTERVAL_DAYS = 30;
 
 export function useSubscription() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       fetchSubscription();
+      // Also check Stripe subscription status
+      checkStripeSubscription();
     } else {
       setSubscription(null);
       setLoading(false);
     }
   }, [user]);
+
+  // Check Stripe on page load and after checkout redirect
+  useEffect(() => {
+    if (!user) return;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('checkout') === 'success') {
+      // Delay to allow Stripe to process
+      setTimeout(() => {
+        checkStripeSubscription();
+      }, 2000);
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [user]);
+
+  const checkStripeSubscription = async () => {
+    if (!session?.access_token) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      if (error) {
+        console.error('Failed to check Stripe subscription:', error);
+        return;
+      }
+
+      if (data?.subscribed) {
+        // Stripe says premium — refetch local subscription to get updated status
+        await fetchSubscription();
+      }
+    } catch (err) {
+      console.error('Stripe check error:', err);
+    }
+  };
 
   const fetchSubscription = async () => {
     if (!user) return;
@@ -41,13 +77,11 @@ export function useSubscription() {
       }
 
       if (data) {
-        // Check if we need to reset the scan count
         const resetDate = new Date(data.scans_reset_at);
         const now = new Date();
         const daysSinceReset = Math.floor((now.getTime() - resetDate.getTime()) / (1000 * 60 * 60 * 24));
         
         if (daysSinceReset >= RESET_INTERVAL_DAYS) {
-          // Reset the scan count
           const { data: updated } = await supabase
             .from('subscriptions')
             .update({ scans_used: 0, scans_reset_at: now.toISOString() })
@@ -103,5 +137,6 @@ export function useSubscription() {
     incrementScanCount,
     getDaysUntilReset,
     refetch: fetchSubscription,
+    checkStripeSubscription,
   };
 }

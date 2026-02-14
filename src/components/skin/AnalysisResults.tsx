@@ -3,6 +3,7 @@ import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download
 import { ScoreGauge } from './ScoreGauge';
 import { RoutineGenerator } from './RoutineGenerator';
 import { IngredientGlossary } from './IngredientGlossary';
+import { ShareScoreCard } from './ShareScoreCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Problem {
@@ -224,6 +225,9 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
           </button>
         </div>
       )}
+
+      {/* Share Score Card */}
+      <ShareScoreCard score={data.score} skinType={skinType} concerns={concerns} />
 
       {/* Download Report Button */}
       <button
