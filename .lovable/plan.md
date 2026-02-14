@@ -1,35 +1,41 @@
 
 
-# Replace Crown Icon with Gem Across the App
+# Darken the Background: From Grey-Blue to True Black
 
-## Summary
-Swap every instance of the `Crown` icon (used for PRO/Premium indicators) with the `Gem` icon from lucide-react. This affects 8 files across the app.
+## The Problem
+The current background uses `220 15% 7%` which has a blue tint and 7% lightness, making it look like dark grey rather than black. Cards at 11% lightness compound this washed-out feel.
 
-## Files to Update
+## The Fix
+Drop the saturation and lightness on all dark surfaces to get back to a true black foundation while keeping the clinical-luxury accent colors.
 
-**1. `src/pages/Index.tsx`** -- PRO badge in the header
+### CSS Variable Changes (src/index.css)
 
-**2. `src/components/premium/PremiumBanner.tsx`** -- "Upgrade to Premium" header icon
+| Token | Current | New | Why |
+|-------|---------|-----|-----|
+| --background | 220 15% 7% | 220 10% 4% | Near-black with minimal blue tint |
+| --card | 220 14% 11% | 220 10% 7% | Darker cards, still distinguishable |
+| --popover | 220 14% 11% | 220 10% 7% | Match card darkness |
+| --muted | 220 12% 16% | 220 10% 12% | Darker muted surfaces |
+| --input | 220 12% 16% | 220 10% 12% | Match muted |
+| --border | 220 12% 20% | 220 10% 15% | Subtler borders |
+| --obsidian | 220 15% 7% | 220 10% 4% | Match background |
+| --obsidian-light | 220 14% 11% | 220 10% 7% | Match card |
+| --glass-border | 220 12% 25% | 220 10% 18% | Subtler glass edges |
+| --sidebar-background | 220 15% 9% | 220 10% 5% | Darker sidebar |
+| --sidebar-accent | 220 12% 16% | 220 10% 12% | Match muted |
+| --sidebar-border | 220 12% 20% | 220 10% 15% | Match border |
 
-**3. `src/components/premium/PremiumUpgradeModal.tsx`** -- Hero icon, CTA button icon
+### Body Gradient
+Update from `hsl(220, 15%, 8%) to hsl(220, 15%, 5%)` to `hsl(220, 10%, 4%) to hsl(220, 10%, 2%)` for a near-pure-black base.
 
-**4. `src/components/skin/FirstScanRequired.tsx`** -- Premium feature icon + badge
+### Glassmorphism Card
+Update `.glass-card` background from `hsla(220, 14%, 13%, 0.6)` to `hsla(220, 10%, 8%, 0.6)` and the border from `hsla(220, 12%, 28%, 0.3)` to `hsla(220, 10%, 20%, 0.3)`.
 
-**5. `src/components/skin/SkynLanding.tsx`** -- Any PRO references on the landing page
+### Files to Edit
+- `src/index.css` (only file affected -- all changes are CSS variable updates)
 
-**6. `src/components/settings/SettingsPage.tsx`** -- Settings premium section
-
-**7. `src/components/skin/SkinForm.tsx`** -- "Premium" routine tier icon
-
-**8. `src/components/skin/AnalysisResults.tsx`** -- Premium upsell card icon
-
-## What Changes Per File
-- Replace `Crown` with `Gem` in the lucide-react import statement
-- Replace all `<Crown ... />` JSX usages with `<Gem ... />`
-- No layout, sizing, or color changes needed -- just the icon swap
-
-## What Stays the Same
-- All icon sizes, colors, and positioning remain identical
-- All premium/PRO logic and gating unchanged
-- No new dependencies needed (`Gem` is already in lucide-react)
+### What Stays the Same
+- All accent colors (teal, rose-gold, lavender)
+- All component layouts and logic
+- Glow/animation effects (they'll actually pop more against true black)
 
