@@ -306,8 +306,8 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan, onU
     <div className="space-y-6 animate-fade-in">
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-background to-secondary/20 p-6 border border-primary/20">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,245,255,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(112,0,255,0.15),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsla(180,45%,55%,0.1),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,hsla(350,40%,65%,0.08),transparent_50%)]" />
         
         <div className="relative z-10 text-center space-y-4">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-secondary mb-2 animate-scale-in">

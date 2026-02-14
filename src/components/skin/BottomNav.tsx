@@ -51,8 +51,8 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             onClick={() => onTabChange(centerTab.id)}
             className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-300 ${
               activeTab === centerTab.id
-                ? 'text-secondary bg-secondary/15 shadow-[0_0_12px_rgba(112,0,255,0.3)]'
-                : 'text-muted-foreground hover:text-secondary hover:bg-secondary/10'
+                ? 'text-accent bg-accent/15 shadow-[0_0_12px_hsla(260,30%,55%,0.25)]'
+                : 'text-muted-foreground hover:text-accent hover:bg-accent/10'
             }`}
           >
             <centerTab.icon className={`w-6 h-6 transition-transform duration-300 ${
@@ -61,7 +61,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                 : ''
             }`} />
             <span className={`text-[10px] font-semibold ${
-              activeTab === centerTab.id ? 'text-secondary' : ''
+              activeTab === centerTab.id ? 'text-accent' : ''
             }`}>
               {centerTab.label}
             </span>
