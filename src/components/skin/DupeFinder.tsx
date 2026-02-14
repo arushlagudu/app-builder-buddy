@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Loader2, DollarSign, Check, Sparkles, ExternalLink, TrendingDown } from 'lucide-react';
+import { X, Loader2, DollarSign, Check, Search, ExternalLink, TrendingDown } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
@@ -213,7 +213,7 @@ export function DupeFinder({ productName, skinType, concerns, isOpen, onClose }:
           {/* Error/Empty State */}
           {!loading && hasSearched && !result?.alternatives?.length && (
             <div className="text-center py-8">
-              <Sparkles className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
+              <Search className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">No alternatives found. Try a different product.</p>
               <button
                 onClick={findAlternatives}

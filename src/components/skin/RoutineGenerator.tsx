@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, Zap, Flame, Loader2, Sun, Moon, Calendar, ChevronDown, ChevronUp, Clock, Droplets, Info, ExternalLink, Leaf, FlaskConical } from 'lucide-react';
+import { Zap, Flame, Loader2, Sun, Moon, Calendar, ChevronDown, ChevronUp, Clock, Droplets, Info, ExternalLink, Leaf, FlaskConical, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -48,7 +48,7 @@ const intensityConfig = {
   simple: {
     label: 'Simple',
     description: '3-4 steps • Quick & easy',
-    icon: Sparkles,
+    icon: Leaf,
     color: 'text-emerald-500',
     bgColor: 'bg-emerald-500/10',
     borderColor: 'border-emerald-500/30',
@@ -87,7 +87,7 @@ const chemicalConfig = {
   balanced: {
     label: 'Balanced',
     description: 'Mix of natural & clinical',
-    icon: Sparkles,
+    icon: FlaskConical,
     color: 'text-blue-500',
     bgColor: 'bg-blue-500/10',
     borderColor: 'border-blue-500/30',
@@ -539,7 +539,7 @@ export function RoutineGenerator({ skinType, concerns, problems, score, climate,
           </>
         ) : (
           <>
-            <Sparkles className="w-5 h-5" />
+            <Wand2 className="w-5 h-5" />
             Make My Routine
           </>
         )}

@@ -1,4 +1,4 @@
-import { ScanFace, Crown, TrendingUp, Package, Sparkles, Clock, Zap, Shield, Target, BarChart3 } from 'lucide-react';
+import { ScanFace, Crown, TrendingUp, Package, Bot, Clock, Zap, Shield, Target, BarChart3 } from 'lucide-react';
 
 interface FeatureHighlight {
   icon: React.ReactNode;
@@ -25,7 +25,7 @@ const defaultHighlights: Record<string, FeatureHighlight[]> = {
     { icon: <Target className="w-4 h-4" />, text: 'Personalized product recommendations' },
   ],
   'AI Skin Coach': [
-    { icon: <Sparkles className="w-4 h-4" />, text: 'Neural-powered daily insights' },
+    { icon: <Bot className="w-4 h-4" />, text: 'Neural-powered daily insights' },
     { icon: <Zap className="w-4 h-4" />, text: 'Adaptive real-time recommendations' },
     { icon: <Target className="w-4 h-4" />, text: 'Climate-aware routine optimization' },
   ],
