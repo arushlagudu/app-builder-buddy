@@ -473,15 +473,6 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan, onU
         
       </div>
 
-      {/* Quick Stats */}
-      <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 text-center">
-        <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">99%</div>
-        <div className="text-sm text-muted-foreground mt-1">Skin Analysis Accuracy</div>
-        <div className="text-xs text-muted-foreground/70 mt-0.5">Powered by Deep Machine Learning</div>
-        <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/20 border border-green-500/30">
-          <span className="text-[10px] font-semibold text-green-400">✓ Dermatologist Certified</span>
-        </div>
-      </div>
 
       {/* CTA */}
       <Card className="border-primary/30 bg-gradient-to-r from-primary/10 to-secondary/10">
