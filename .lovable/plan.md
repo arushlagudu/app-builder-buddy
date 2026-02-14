@@ -1,74 +1,35 @@
 
-# UI Color Refinement: From Generic Tech to Premium Skincare
 
-## The Problem
-The current color scheme (electric cyan #00F5FF + ultraviolet #7000FF on obsidian black) reads as a gaming/crypto app, not a clinical skincare tool. The heavy neon gradients, glow effects, and saturated colors feel templated and undermine trust.
+# Replace Crown Icon with Gem Across the App
 
-## The Solution
-Shift to a refined, clinical-luxury palette that still feels modern but is grounded in skincare aesthetics. Think high-end dermatology clinic meets modern tech.
+## Summary
+Swap every instance of the `Crown` icon (used for PRO/Premium indicators) with the `Gem` icon from lucide-react. This affects 8 files across the app.
 
-### New Color Direction
-- **Primary**: Soft teal (180 45% 55%) -- calming, clinical, associated with health/wellness
-- **Secondary**: Warm rose-gold (350 40% 65%) -- premium, luxury, skin-toned
-- **Background**: Deep charcoal (220 15% 8%) -- keep the dark mode but soften it
-- **Accents**: Muted lavender for PRO badges instead of neon purple
-- **Text**: Warmer off-white instead of stark blue-white
+## Files to Update
 
-### What Changes
+**1. `src/pages/Index.tsx`** -- PRO badge in the header
 
-**1. CSS Variables (src/index.css)**
-- Update primary from electric cyan to soft teal
-- Update secondary from ultraviolet to warm rose-gold
-- Soften the border and muted colors for less harsh contrast
-- Tone down the glow/shadow effects (less neon, more subtle luminance)
+**2. `src/components/premium/PremiumBanner.tsx`** -- "Upgrade to Premium" header icon
 
-**2. Glow/Animation Effects (src/index.css)**
-- Reduce glow intensity on `.glow-cyan`, `.glow-violet`
-- Soften text-glow effects
-- Make pulse animations subtler
-- Keep glassmorphism but with warmer tint
+**3. `src/components/premium/PremiumUpgradeModal.tsx`** -- Hero icon, CTA button icon
 
-**3. Landing Page (src/components/skin/SkynLanding.tsx)**
-- Hero gradient shifts from cyan/purple radials to teal/rose soft radials
-- "New Scan" button uses refined gradient instead of neon stripe
-- Feature cards use softer accent backgrounds
-- PRO badges use muted lavender instead of electric purple
+**4. `src/components/skin/FirstScanRequired.tsx`** -- Premium feature icon + badge
 
-**4. Bottom Navigation (src/components/skin/BottomNav.tsx)**
-- Active state uses new teal primary instead of cyan glow
+**5. `src/components/skin/SkynLanding.tsx`** -- Any PRO references on the landing page
 
-**5. Premium components (PremiumBanner, PremiumUpgradeModal)**
-- CTA buttons use the new teal-to-rose gradient
-- Crown/PRO styling uses rose-gold accent
+**6. `src/components/settings/SettingsPage.tsx`** -- Settings premium section
 
-**6. Tailwind config (tailwind.config.ts)**
-- Update custom color references to match new palette
+**7. `src/components/skin/SkinForm.tsx`** -- "Premium" routine tier icon
 
-### What Stays the Same
-- Overall dark mode aesthetic (just warmer)
-- Layout and component structure
-- Glassmorphism card style (just warmer tones)
-- All functionality and features
+**8. `src/components/skin/AnalysisResults.tsx`** -- Premium upsell card icon
 
-## Technical Details
+## What Changes Per File
+- Replace `Crown` with `Gem` in the lucide-react import statement
+- Replace all `<Crown ... />` JSX usages with `<Gem ... />`
+- No layout, sizing, or color changes needed -- just the icon swap
 
-### New CSS Variable Values
-```text
---primary:        180 45% 55%    (soft teal)
---secondary:      350 40% 65%    (rose-gold)
---accent:         260 30% 55%    (muted lavender)
---muted:          220 12% 16%    (warmer dark)
---border:         220 12% 20%    (softer borders)
---ring:           180 45% 55%    (matches primary)
---electric-cyan replaced with --teal: 180 45% 55%
---ultraviolet replaced with --rose: 350 40% 65%
-```
+## What Stays the Same
+- All icon sizes, colors, and positioning remain identical
+- All premium/PRO logic and gating unchanged
+- No new dependencies needed (`Gem` is already in lucide-react)
 
-### Files to Edit
-1. `src/index.css` -- color variables + effect classes
-2. `tailwind.config.ts` -- custom color names
-3. `src/components/skin/SkynLanding.tsx` -- gradient references
-4. `src/components/skin/BottomNav.tsx` -- active state colors
-5. `src/components/premium/PremiumBanner.tsx` -- accent colors
-6. `src/components/premium/PremiumUpgradeModal.tsx` -- CTA gradient
-7. Any other components using `cyan-electric`, `violet-ultra`, or hardcoded HSL values
