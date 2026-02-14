@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { User, Bell, Palette, HelpCircle, LogOut, ChevronRight, Shield, FileText, RotateCcw, Trash2 } from 'lucide-react';
+import { User, Bell, Palette, HelpCircle, LogOut, ChevronRight, Shield, FileText, RotateCcw, Trash2, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useSubscription } from '@/hooks/useSubscription';
 import { ProfileSettings } from './ProfileSettings';
 import { ReminderSettings } from './ReminderSettings';
 import { Switch } from '@/components/ui/switch';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 type SettingsSection = 'main' | 'profile' | 'reminders';
@@ -43,8 +45,21 @@ function SettingsItem({ icon, label, description, onClick, rightElement, danger 
 
 export function SettingsPage() {
   const { user, signOut } = useAuth();
+  const { isPremium } = useSubscription();
   const [section, setSection] = useState<SettingsSection>('main');
   const [darkMode, setDarkMode] = useState(true);
+
+  const handleManageSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (err) {
+      toast.error('Unable to open subscription management. Please try again.');
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -118,6 +133,14 @@ export function SettingsPage() {
           description="AM/PM routine notifications"
           onClick={() => setSection('reminders')}
         />
+        {isPremium && (
+          <SettingsItem
+            icon={<CreditCard className="w-5 h-5" />}
+            label="Manage Subscription"
+            description="Billing, cancel, or change plan"
+            onClick={handleManageSubscription}
+          />
+        )}
       </div>
 
       {/* Appearance Section */}
