@@ -7,22 +7,22 @@
 @layer base {
   :root {
     /* Clinical-Luxury Theme */
-    --background: 220 15% 7%;
+    --background: 220 10% 4%;
     --foreground: 30 20% 93%;
     
-    --card: 220 14% 11%;
+    --card: 220 10% 7%;
     --card-foreground: 30 20% 93%;
     
-    --popover: 220 14% 11%;
+    --popover: 220 10% 7%;
     --popover-foreground: 30 20% 93%;
     
     --primary: 180 45% 55%;
-    --primary-foreground: 220 15% 7%;
+    --primary-foreground: 220 10% 4%;
     
     --secondary: 350 40% 65%;
     --secondary-foreground: 30 20% 93%;
     
-    --muted: 220 12% 16%;
+    --muted: 220 10% 12%;
     --muted-foreground: 220 15% 60%;
     
     --accent: 260 30% 55%;
@@ -31,27 +31,27 @@
     --destructive: 0 72% 55%;
     --destructive-foreground: 30 20% 93%;
     
-    --border: 220 12% 20%;
-    --input: 220 12% 16%;
+    --border: 220 10% 15%;
+    --input: 220 10% 12%;
     --ring: 180 45% 55%;
     
     --radius: 1rem;
     
     /* Custom colors */
-    --obsidian: 220 15% 7%;
-    --obsidian-light: 220 14% 11%;
+    --obsidian: 220 10% 4%;
+    --obsidian-light: 220 10% 7%;
     --electric-cyan: 180 45% 55%;
     --ultraviolet: 350 40% 65%;
-    --glass-border: 220 12% 25%;
+    --glass-border: 220 10% 18%;
     
     /* Sidebar */
-    --sidebar-background: 220 15% 9%;
+    --sidebar-background: 220 10% 5%;
     --sidebar-foreground: 30 20% 93%;
     --sidebar-primary: 180 45% 55%;
-    --sidebar-primary-foreground: 220 15% 7%;
-    --sidebar-accent: 220 12% 16%;
+    --sidebar-primary-foreground: 220 10% 4%;
+    --sidebar-accent: 220 10% 12%;
     --sidebar-accent-foreground: 30 20% 93%;
-    --sidebar-border: 220 12% 20%;
+    --sidebar-border: 220 10% 15%;
     --sidebar-ring: 180 45% 55%;
   }
 }
@@ -63,7 +63,7 @@
   
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    background: linear-gradient(180deg, hsl(220, 15%, 8%) 0%, hsl(220, 15%, 5%) 100%);
+    background: linear-gradient(180deg, hsl(220, 10%, 4%) 0%, hsl(220, 10%, 2%) 100%);
     min-height: 100vh;
   }
 }
@@ -72,10 +72,10 @@
   /* Glassmorphism card */
   .glass-card {
     @apply relative overflow-hidden rounded-2xl;
-    background: hsla(220, 14%, 13%, 0.6);
+    background: hsla(220, 10%, 8%, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid hsla(220, 12%, 28%, 0.3);
+    border: 1px solid hsla(220, 10%, 20%, 0.3);
   }
   
   .glass-card::before {
