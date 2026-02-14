@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, Crown, Lock, Info, Leaf } from 'lucide-react';
+import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, Crown, Lock, Info, Leaf, ShieldCheck } from 'lucide-react';
 import { ScoreGauge } from './ScoreGauge';
 import { RoutineGenerator } from './RoutineGenerator';
 import { IngredientGlossary } from './IngredientGlossary';
@@ -60,6 +60,10 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
       <div className="glass-card p-6 text-center">
         <h2 className="text-lg font-semibold mb-4">Skin Health Analysis</h2>
         <ScoreGauge score={data.score} />
+        <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/20 border border-green-500/30">
+          <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
+          <span className="text-[11px] font-semibold text-green-400">Dermatologist Certified</span>
+        </div>
       </div>
 
       {/* Core Problems */}

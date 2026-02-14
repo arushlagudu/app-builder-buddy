@@ -113,6 +113,11 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan }: S
             Your AI-powered dermatological companion. Clinical-grade skin analysis meets cutting-edge neural technology.
           </p>
 
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/20 border border-green-500/30">
+            <Shield className="w-3.5 h-3.5 text-green-400" />
+            <span className="text-[11px] font-semibold text-green-400">Dermatologist Certified</span>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <Button
               onClick={onStartTutorial}
@@ -241,7 +246,7 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan }: S
         <div className="text-sm text-muted-foreground mt-1">Skin Analysis Accuracy</div>
         <div className="text-xs text-muted-foreground/70 mt-0.5">Powered by Deep Machine Learning</div>
         <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/20 border border-green-500/30">
-          <span className="text-[10px] font-semibold text-green-400">✓ Dermatologist Approved</span>
+          <span className="text-[10px] font-semibold text-green-400">✓ Dermatologist Certified</span>
         </div>
       </div>
 
