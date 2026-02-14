@@ -42,7 +42,7 @@ serve(async (req) => {
       prompt = `Generate a short, universal daily skincare tip that anyone can use. Return JSON with "title" (max 8 words, catchy) and "content" (max 2 sentences, specific and actionable). No markdown.`;
     }
 
-    const response = await fetch("https://api.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
