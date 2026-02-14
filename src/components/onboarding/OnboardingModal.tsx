@@ -89,6 +89,18 @@ const steps = [
       { icon: Shield, label: 'Personalized advice' },
     ],
   },
+  {
+    id: 'start_scan',
+    title: "You're All Set!",
+    subtitle: 'Start Your First Scan Now',
+    description: "Your first scan is completely FREE. Let's analyze your skin and build your personalized routine right now.",
+    icon: Camera,
+    features: [
+      { icon: Zap, label: 'Instant results' },
+      { icon: Shield, label: '100% free first scan' },
+      { icon: Star, label: 'Personalized routine' },
+    ],
+  },
 ];
 
 export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
@@ -218,9 +230,13 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
 
           <button
             onClick={handleNext}
-            className="flex items-center gap-1 px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-foreground font-medium text-sm btn-shine"
+            className={`flex items-center gap-1 px-6 py-2.5 rounded-xl font-medium text-sm btn-shine ${
+              isLastStep
+                ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white pulse-glow'
+                : 'bg-gradient-to-r from-primary to-secondary text-primary-foreground'
+            }`}
           >
-            {isLastStep ? "Let's Go!" : 'Next'}
+            {isLastStep ? '🔬 Start My First Scan' : 'Next'}
             {!isLastStep && <ChevronRight className="w-4 h-4" />}
           </button>
         </div>

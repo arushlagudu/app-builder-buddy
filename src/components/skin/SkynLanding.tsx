@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { 
   Dna, 
   ScanFace, 
@@ -14,15 +15,29 @@ import {
   BarChart3,
   Cpu,
   Eye,
-  Wand2
+  Wand2,
+  Lightbulb,
+  ArrowUp,
+  ArrowDown,
+  Clock,
+  Sparkles,
+  MessageCircle
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import type { LatestAnalysis, PreviousAnalysis } from '@/hooks/useLatestAnalysis';
+import type { User } from '@supabase/supabase-js';
 
 interface SkynLandingProps {
   onStartTutorial: () => void;
   onGoToScan: () => void;
   hasCompletedScan: boolean;
+  onUpgrade?: () => void;
+  latestAnalysis?: LatestAnalysis | null;
+  previousAnalysis?: PreviousAnalysis | null;
+  user?: User | null;
+  onGoToCoach?: () => void;
 }
 
 const features = [
@@ -91,7 +106,201 @@ const premiumHighlights = [
   },
 ];
 
-export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan }: SkynLandingProps) {
+function DailyTipCard({ user, hasCompletedScan, onGoToScan, onGoToCoach }: { 
+  user?: User | null; 
+  hasCompletedScan: boolean;
+  onGoToScan: () => void;
+  onGoToCoach?: () => void;
+}) {
+  const [tip, setTip] = useState<{ title: string; content: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    fetchOrGenerateTip();
+  }, [user]);
+
+  const fetchOrGenerateTip = async () => {
+    if (!user) return;
+    
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Check for existing tip today
+      const { data: existingTips } = await supabase
+        .from('daily_tips')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('created_at', `${today}T00:00:00`)
+        .lte('created_at', `${today}T23:59:59`)
+        .limit(1);
+
+      if (existingTips && existingTips.length > 0) {
+        setTip({ title: existingTips[0].title, content: existingTips[0].content });
+        setLoading(false);
+        return;
+      }
+
+      // Generate new tip
+      const { data, error } = await supabase.functions.invoke('generate-daily-tip', {
+        body: { userId: user.id },
+      });
+
+      if (!error && data?.title && data?.content) {
+        setTip({ title: data.title, content: data.content });
+        // Save to DB
+        await supabase.from('daily_tips').insert({
+          user_id: user.id,
+          title: data.title,
+          content: data.content,
+          tip_type: 'daily',
+        });
+      }
+    } catch (err) {
+      console.error('Failed to get daily tip:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user) return null;
+
+  return (
+    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5 overflow-hidden">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+            <Lightbulb className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">Today's Skin Tip</h3>
+            <p className="text-[10px] text-muted-foreground">Personalized for you</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="h-12 rounded-lg bg-muted/30 animate-pulse" />
+        ) : tip ? (
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-foreground">{tip.title}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{tip.content}</p>
+          </div>
+        ) : !hasCompletedScan ? (
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">Get personalized daily tips — complete your first scan!</p>
+            <Button size="sm" variant="outline" onClick={onGoToScan} className="text-xs">
+              <ScanFace className="w-3 h-3 mr-1" /> Start First Scan
+            </Button>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Stay hydrated and protect your skin barrier today! ✨</p>
+        )}
+
+        {tip && onGoToCoach && (
+          <button
+            onClick={onGoToCoach}
+            className="mt-3 flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
+          >
+            <MessageCircle className="w-3 h-3" />
+            Ask the AI Coach for more
+            <ChevronRight className="w-3 h-3" />
+          </button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function SkinStatusCard({ latestAnalysis, previousAnalysis, onGoToScan }: {
+  latestAnalysis?: LatestAnalysis | null;
+  previousAnalysis?: PreviousAnalysis | null;
+  onGoToScan: () => void;
+}) {
+  if (!latestAnalysis?.score) return null;
+
+  const daysSinceLastScan = Math.floor(
+    (Date.now() - new Date(latestAnalysis.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  const scoreDelta = previousAnalysis?.score 
+    ? latestAnalysis.score - previousAnalysis.score 
+    : null;
+
+  const urgencyColor = daysSinceLastScan < 14 
+    ? 'text-green-400' 
+    : daysSinceLastScan < 30 
+    ? 'text-yellow-400' 
+    : 'text-red-400';
+
+  const urgencyBg = daysSinceLastScan < 14 
+    ? 'bg-green-500/10 border-green-500/20' 
+    : daysSinceLastScan < 30 
+    ? 'bg-yellow-500/10 border-yellow-500/20' 
+    : 'bg-red-500/10 border-red-500/20';
+
+  return (
+    <Card className={`border overflow-hidden ${urgencyBg}`}>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-primary" />
+            Skin Status
+          </h3>
+          <div className={`flex items-center gap-1 text-xs font-medium ${urgencyColor}`}>
+            <Clock className="w-3 h-3" />
+            {daysSinceLastScan === 0 ? 'Today' : `${daysSinceLastScan}d ago`}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {/* Score */}
+          <div className="text-center">
+            <div className="text-3xl font-bold text-foreground">{latestAnalysis.score}</div>
+            <div className="text-[10px] text-muted-foreground">/10</div>
+          </div>
+
+          {/* Delta */}
+          {scoreDelta !== null && (
+            <div className={`flex items-center gap-1 px-2 py-1 rounded-lg ${
+              scoreDelta > 0 ? 'bg-green-500/20 text-green-400' : scoreDelta < 0 ? 'bg-red-500/20 text-red-400' : 'bg-muted/30 text-muted-foreground'
+            }`}>
+              {scoreDelta > 0 ? <ArrowUp className="w-3 h-3" /> : scoreDelta < 0 ? <ArrowDown className="w-3 h-3" /> : null}
+              <span className="text-xs font-bold">{scoreDelta > 0 ? '+' : ''}{scoreDelta.toFixed(1)}</span>
+            </div>
+          )}
+
+          {/* CTA */}
+          <div className="flex-1 text-right">
+            {daysSinceLastScan >= 14 ? (
+              <Button size="sm" onClick={onGoToScan} className="text-xs bg-gradient-to-r from-primary to-secondary text-primary-foreground">
+                Re-scan Now
+              </Button>
+            ) : scoreDelta !== null && scoreDelta > 0 ? (
+              <span className="text-xs text-green-400 font-medium">Looking good! 🎉</span>
+            ) : scoreDelta !== null && scoreDelta < 0 ? (
+              <Button size="sm" variant="outline" onClick={onGoToScan} className="text-xs border-red-500/30 text-red-400">
+                Re-scan to Update
+              </Button>
+            ) : (
+              <span className="text-xs text-muted-foreground">Keep it up!</span>
+            )}
+          </div>
+        </div>
+
+        {scoreDelta !== null && scoreDelta < 0 && (
+          <p className="text-xs text-red-400/80 mt-2">
+            Your skin score dropped. Re-scan to track changes and get updated recommendations.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan, onUpgrade, latestAnalysis, previousAnalysis, user, onGoToCoach }: SkynLandingProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -140,15 +349,38 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan }: S
         </div>
       </div>
 
+      {/* Skin Status Card */}
+      <SkinStatusCard 
+        latestAnalysis={latestAnalysis}
+        previousAnalysis={previousAnalysis}
+        onGoToScan={onGoToScan}
+      />
+
+      {/* Daily Tip Card */}
+      <DailyTipCard 
+        user={user}
+        hasCompletedScan={hasCompletedScan}
+        onGoToScan={onGoToScan}
+        onGoToCoach={onGoToCoach}
+      />
+
       {/* Premium Spotlight */}
-      <Card className="border-secondary/30 bg-gradient-to-br from-secondary/5 to-primary/5 overflow-hidden">
+      <Card 
+        className="border-secondary/30 bg-gradient-to-br from-secondary/5 to-primary/5 overflow-hidden cursor-pointer hover:border-secondary/50 transition-all"
+        onClick={onUpgrade}
+      >
         <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/20 border border-secondary/30">
-              <Crown className="w-3.5 h-3.5 text-secondary" />
-              <span className="text-xs font-semibold text-secondary">PREMIUM</span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/20 border border-secondary/30">
+                <Crown className="w-3.5 h-3.5 text-secondary" />
+                <span className="text-xs font-semibold text-secondary">PREMIUM</span>
+              </div>
+              <span className="text-sm text-muted-foreground">Unlock the full power</span>
             </div>
-            <span className="text-sm text-muted-foreground">Unlock the full power</span>
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-primary/20 text-primary border border-primary/30 animate-pulse">
+              7-DAY FREE TRIAL
+            </span>
           </div>
           
           <div className="grid grid-cols-2 gap-3">
@@ -171,9 +403,10 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan }: S
           
           <div className="mt-4 p-3 rounded-xl bg-secondary/10 border border-secondary/20 text-center">
             <p className="text-sm text-foreground">
-              <span className="font-bold text-secondary">$9.99/mo</span>
-              <span className="text-muted-foreground"> • Unlimited access to all features</span>
+              <span className="font-bold text-secondary">Start Free Trial</span>
+              <span className="text-muted-foreground"> • Then $9.99/mo</span>
             </p>
+            <p className="text-[10px] text-muted-foreground mt-1">Join 10,000+ users improving their skin</p>
           </div>
         </CardContent>
       </Card>

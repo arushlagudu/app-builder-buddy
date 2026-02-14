@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 interface PremiumUpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  trigger?: 'scan_limit' | 'routine' | 'progress' | 'scanner' | 'coach' | 'analytics' | 'history';
+  trigger?: 'scan_limit' | 'routine' | 'progress' | 'scanner' | 'coach' | 'analytics' | 'history' | 'first_results';
 }
 
 const triggerMessages: Record<string, { title: string; subtitle: string }> = {
@@ -19,6 +19,7 @@ const triggerMessages: Record<string, { title: string; subtitle: string }> = {
   coach: { title: "Your Personal Skin Expert", subtitle: "Get daily tips adapted to your skin, weather, and lifestyle" },
   analytics: { title: "Understand Your Skin Trends", subtitle: "Data-driven insights that reveal what's really working" },
   history: { title: "Access Your Full History", subtitle: "Review all past analyses and track your complete journey" },
+  first_results: { title: "Your Results Are Ready! 🎉", subtitle: "Unlock your full personalized routine and track your progress" },
 };
 
 const premiumFeatures = [
@@ -154,11 +155,11 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'scan_limit' }:
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             <span className="relative flex items-center justify-center gap-2 text-background">
               <Crown className="w-5 h-5" />
-              {isLoading ? 'Opening Checkout...' : `Unlock Premium — $${selectedPlan === 'annual' ? STRIPE_PRICES.annual.amount + '/yr' : STRIPE_PRICES.monthly.amount + '/mo'}`}
+              {isLoading ? 'Opening Checkout...' : 'Start 7-Day Free Trial'}
             </span>
           </button>
           <p className="text-center text-xs text-muted-foreground mt-3">
-            Cancel anytime • Instant access
+            No charge for 7 days • Cancel anytime • Instant access
           </p>
           <button onClick={onClose} className="w-full mt-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
             Continue with free plan (2 scans/month)

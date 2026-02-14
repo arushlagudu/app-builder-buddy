@@ -4,7 +4,7 @@ import { useAuth } from './useAuth';
 
 interface Subscription {
   id: string;
-  status: 'free' | 'premium' | 'cancelled';
+  status: string;
   scans_used: number;
   scans_reset_at: string;
 }
@@ -101,7 +101,7 @@ export function useSubscription() {
     }
   };
 
-  const isPremium = subscription?.status === 'premium';
+  const isPremium = subscription?.status === 'premium' || subscription?.status === 'trialing';
   const scansRemaining = isPremium ? Infinity : Math.max(0, FREE_SCAN_LIMIT - (subscription?.scans_used || 0));
   const canScan = isPremium || scansRemaining > 0;
 

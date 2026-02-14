@@ -48,18 +48,26 @@ serve(async (req) => {
     }
 
     const customerId = customers.data[0].id;
-    const subscriptions = await stripe.subscriptions.list({
+    // Check both active and trialing subscriptions
+    const activeSubscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
       limit: 1,
     });
 
-    const hasActiveSub = subscriptions.data.length > 0;
+    const trialingSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "trialing",
+      limit: 1,
+    });
+
+    const allSubs = [...activeSubscriptions.data, ...trialingSubscriptions.data];
+    const hasActiveSub = allSubs.length > 0;
     let subscriptionEnd = null;
     let priceId = null;
 
     if (hasActiveSub) {
-      const sub = subscriptions.data[0];
+      const sub = allSubs[0];
       subscriptionEnd = new Date(sub.current_period_end * 1000).toISOString();
       priceId = sub.items.data[0].price.id;
 
