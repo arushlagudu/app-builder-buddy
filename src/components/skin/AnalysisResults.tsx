@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, Crown, Lock, Info, Leaf, ShieldCheck } from 'lucide-react';
+import { Droplet, AlertTriangle, Zap, X, Check, ChevronDown, ChevronUp, Download, Gem, Lock, Info, Leaf, ShieldCheck } from 'lucide-react';
 import { ScoreGauge } from './ScoreGauge';
 import { RoutineGenerator } from './RoutineGenerator';
 import { IngredientGlossary } from './IngredientGlossary';
@@ -209,7 +209,7 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
         /* Premium Upsell for Routine */
         <div className="glass-card p-6 text-center border-secondary/30">
           <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-3">
-            <Crown className="w-6 h-6 text-secondary" />
+            <Gem className="w-6 h-6 text-secondary" />
           </div>
           <h3 className="font-semibold mb-2">Personalized In-Depth Routine</h3>
           <p className="text-sm text-muted-foreground mb-4">
@@ -219,7 +219,7 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
             onClick={onUpgradeClick}
             className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-secondary to-primary text-primary-foreground font-medium text-sm btn-shine flex items-center gap-2 mx-auto"
           >
-            <Crown className="w-4 h-4" />
+            <Gem className="w-4 h-4" />
             Upgrade to Premium
             <Lock className="w-3 h-3" />
           </button>

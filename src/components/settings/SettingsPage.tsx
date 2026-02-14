@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Bell, Palette, HelpCircle, LogOut, ChevronRight, Shield, FileText, RotateCcw, Trash2, Crown, CreditCard } from 'lucide-react';
+import { User, Bell, Palette, HelpCircle, LogOut, ChevronRight, Shield, FileText, RotateCcw, Trash2, Gem, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { ProfileSettings } from './ProfileSettings';

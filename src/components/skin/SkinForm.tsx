@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Droplet, Sun, Wind, AlertTriangle, Clock, DollarSign, Lock, Crown, Zap, Wand2 } from 'lucide-react';
+import { Droplet, Sun, Wind, AlertTriangle, Clock, DollarSign, Lock, Gem, Zap, Wand2 } from 'lucide-react';
 
 interface SkinFormData {
   skinType: string;
@@ -55,7 +55,7 @@ const budgetLevels = [
 const analysisTiers = [
   { id: 'basic', label: 'Basic', icon: Zap, description: '3-4 steps', locked: false },
   { id: 'advanced', label: 'Advanced', icon: Wand2, description: '4-5 steps', locked: false },
-  { id: 'premium', label: 'Premium', icon: Crown, description: 'Full routine + deep analysis', locked: true },
+  { id: 'premium', label: 'Premium', icon: Gem, description: 'Full routine + deep analysis', locked: true },
 ];
 
 export function SkinForm({ onSubmit, isValid, isPremium = false, onUpgradeClick }: SkinFormProps) {

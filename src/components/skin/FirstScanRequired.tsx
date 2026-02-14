@@ -1,4 +1,4 @@
-import { ScanFace, Crown, TrendingUp, Package, Bot, Clock, Zap, Shield, Target, BarChart3 } from 'lucide-react';
+import { ScanFace, Gem, TrendingUp, Package, Bot, Clock, Zap, Shield, Target, BarChart3 } from 'lucide-react';
 
 interface FeatureHighlight {
   icon: React.ReactNode;
@@ -53,7 +53,7 @@ export function FirstScanRequired({ onGoToScan, featureName, description, isPrem
         isPremiumFeature ? 'bg-gradient-to-br from-secondary/30 to-primary/30 ring-2 ring-secondary/50' : 'bg-primary/20'
       }`}>
         {isPremiumFeature ? (
-          <Crown className="w-10 h-10 text-secondary" />
+          <Gem className="w-10 h-10 text-secondary" />
         ) : (
           <ScanFace className="w-10 h-10 text-primary" />
         )}
@@ -97,7 +97,7 @@ export function FirstScanRequired({ onGoToScan, featureName, description, isPrem
       {/* Premium Badge */}
       {isPremiumFeature && (
         <div className="flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/30">
-          <Crown className="w-4 h-4 text-secondary" />
+          <Gem className="w-4 h-4 text-secondary" />
           <span className="text-sm font-medium text-secondary">Premium Feature • $9.99/mo</span>
         </div>
       )}

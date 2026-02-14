@@ -6,7 +6,7 @@ import {
   Camera, 
   Bot, 
   Flame,
-  Crown,
+  Gem,
   ChevronRight,
   Shield,
   Zap,
