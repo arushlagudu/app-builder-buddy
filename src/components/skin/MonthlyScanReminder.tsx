@@ -1,4 +1,4 @@
-import { Calendar, TrendingUp, Brain, Sparkles } from 'lucide-react';
+import { Calendar, TrendingUp, Brain } from 'lucide-react';
 
 interface MonthlyScanReminderProps {
   lastScanDate?: string;
@@ -40,7 +40,7 @@ export function MonthlyScanReminder({ lastScanDate, onScanClick }: MonthlyScanRe
               <span>Track improvement</span>
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Sparkles className="w-3 h-3 text-secondary" />
+              <Brain className="w-3 h-3 text-secondary" />
               <span>Adaptive coaching</span>
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">

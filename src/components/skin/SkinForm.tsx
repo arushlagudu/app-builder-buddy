@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Droplet, Sun, Wind, Sparkles, AlertTriangle, Clock, DollarSign, Lock, Crown, Zap } from 'lucide-react';
+import { Droplet, Sun, Wind, AlertTriangle, Clock, DollarSign, Lock, Crown, Zap, Wand2 } from 'lucide-react';
 
 interface SkinFormData {
   skinType: string;
@@ -54,7 +54,7 @@ const budgetLevels = [
 
 const analysisTiers = [
   { id: 'basic', label: 'Basic', icon: Zap, description: '3-4 steps', locked: false },
-  { id: 'advanced', label: 'Advanced', icon: Sparkles, description: '4-5 steps', locked: false },
+  { id: 'advanced', label: 'Advanced', icon: Wand2, description: '4-5 steps', locked: false },
   { id: 'premium', label: 'Premium', icon: Crown, description: 'Full routine + deep analysis', locked: true },
 ];
 
@@ -116,7 +116,7 @@ export function SkinForm({ onSubmit, isValid, isPremium = false, onUpgradeClick 
       {/* Skin Type */}
       <div className="glass-card p-5">
         <h3 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-primary" />
+          <Droplet className="w-4 h-4 text-primary" />
           Skin Type
         </h3>
         <div className="grid grid-cols-2 gap-3">
@@ -191,7 +191,7 @@ export function SkinForm({ onSubmit, isValid, isPremium = false, onUpgradeClick 
       {/* Analysis Tier */}
       <div className="glass-card p-5">
         <h3 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-secondary" />
+          <Zap className="w-4 h-4 text-secondary" />
           Analysis Depth
         </h3>
         <div className="grid grid-cols-3 gap-2">

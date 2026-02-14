@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Crown, Send, Loader2, Trash2, Sparkles } from 'lucide-react';
+import { Bot, Crown, Send, Loader2, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAICoachUsage } from '@/hooks/useAICoachUsage';
@@ -242,7 +242,7 @@ export function AISkinCoach({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-secondary" />
+                <Bot className="w-4 h-4 text-secondary" />
               </div>
               <div>
                 <p className="font-medium text-xs">
