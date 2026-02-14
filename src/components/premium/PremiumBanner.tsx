@@ -1,4 +1,4 @@
-import { Crown, Zap, Camera, TrendingUp, Bot, Package, Clock, ListChecks } from 'lucide-react';
+import { Gem, Zap, Camera, TrendingUp, Bot, Package, Clock, ListChecks } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 
 interface PremiumBannerProps {
@@ -23,7 +23,7 @@ export function PremiumBanner({ onUpgrade }: PremiumBannerProps) {
   return (
     <div className="glass-card p-4 border border-secondary/30 bg-gradient-to-br from-secondary/10 to-primary/5">
       <div className="flex items-center gap-2 mb-3">
-        <Crown className="w-5 h-5 text-secondary" />
+        <Gem className="w-5 h-5 text-secondary" />
         <span className="font-semibold text-secondary">Upgrade to Premium</span>
       </div>
 

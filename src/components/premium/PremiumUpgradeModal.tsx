@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Check, Wand2, TrendingUp, Shield, Zap, Crown, Star, Camera, Bot, BarChart3, History } from 'lucide-react';
+import { X, Check, Wand2, TrendingUp, Shield, Zap, Gem, Star, Camera, Bot, BarChart3, History } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { STRIPE_PRICES } from '@/lib/stripe';
 import { supabase } from '@/integrations/supabase/client';
@@ -72,7 +72,7 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'scan_limit' }:
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-2xl rotate-45 animate-pulse" />
             <div className="absolute inset-1 bg-background rounded-xl rotate-45" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <Crown className="w-10 h-10 text-primary" />
+              <Gem className="w-10 h-10 text-primary" />
             </div>
           </div>
           <h2 className="relative text-2xl font-bold bg-gradient-to-r from-primary via-white to-secondary bg-clip-text text-transparent mb-2">
@@ -154,7 +154,7 @@ export function PremiumUpgradeModal({ isOpen, onClose, trigger = 'scan_limit' }:
             <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] animate-[gradient_3s_linear_infinite]" />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             <span className="relative flex items-center justify-center gap-2 text-background">
-              <Crown className="w-5 h-5" />
+              <Gem className="w-5 h-5" />
               {isLoading ? 'Opening Checkout...' : 'Start 7-Day Free Trial'}
             </span>
           </button>
