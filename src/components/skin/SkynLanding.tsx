@@ -406,7 +406,7 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan, onU
               <span className="font-bold text-secondary">Start Free Trial</span>
               <span className="text-muted-foreground"> • Then $9.99/mo</span>
             </p>
-            <p className="text-[10px] text-muted-foreground mt-1">Join 10,000+ users improving their skin</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Unlimited access to all features</p>
           </div>
         </CardContent>
       </Card>
