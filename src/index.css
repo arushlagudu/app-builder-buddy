@@ -220,3 +220,11 @@
     background: hsla(180, 45%, 55%, 0.4);
   }
 }
+
+/* iOS Safe Area Support */
+html, body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
