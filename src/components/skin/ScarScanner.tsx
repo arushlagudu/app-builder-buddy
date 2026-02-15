@@ -137,6 +137,26 @@ export function ScarScanner() {
 
   return (
     <div className="space-y-4">
+      {/* Free user scan limit banner */}
+      {!isPremium && (
+        <div className="glass-card p-3 border border-secondary/30 bg-gradient-to-r from-secondary/10 to-primary/5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Crosshair className="w-4 h-4 text-secondary" />
+              <span className="text-sm font-medium text-foreground">
+                {(() => {
+                  // We don't have scar_scans_used here directly, so show generic message
+                  return '1 free scar scan included';
+                })()}
+              </span>
+            </div>
+            <span className="text-[10px] px-2 py-1 rounded-full bg-secondary/20 text-secondary font-medium">
+              Upgrade for unlimited
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Instructions */}
       <div className="glass-card p-3 bg-primary/5 border-primary/20">
         <div className="flex items-start gap-2">
