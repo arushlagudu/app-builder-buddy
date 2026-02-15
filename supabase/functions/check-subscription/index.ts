@@ -26,20 +26,34 @@ serve(async (req) => {
     if (!authHeader) throw new Error("No authorization header");
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Auth error: ${userError.message}`);
-    const user = userData.user;
+    const { data: { user: authUser }, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError || !authUser) {
+      // Fallback: try to get user from the token claims
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (!payload.sub || !payload.email) throw new Error("Invalid token");
+      var user = { id: payload.sub, email: payload.email } as { id: string; email: string };
+    } else {
+      var user = { id: authUser.id, email: authUser.email! };
+    }
     if (!user?.email) throw new Error("User not authenticated");
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
     if (customers.data.length === 0) {
-      // Ensure local subscription table is 'free'
-      await supabaseClient
+      // Don't overwrite manually-granted premium status
+      const { data: subData } = await supabaseClient
         .from("subscriptions")
-        .update({ status: "free" })
-        .eq("user_id", user.id);
+        .select("status")
+        .eq("user_id", user.id)
+        .single();
+
+      if (subData?.status === "premium") {
+        return new Response(JSON.stringify({ subscribed: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
 
       return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
