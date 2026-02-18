@@ -1,41 +1,59 @@
+# Refine AI Communication Style
 
+Two backend prompt updates to make the AI output more human, readable, and personalized.
 
-# Darken the Background: From Grey-Blue to True Black
+---
 
-## The Problem
-The current background uses `220 15% 7%` which has a blue tint and 7% lightness, making it look like dark grey rather than black. Cards at 11% lightness compound this washed-out feel.
+## 1. Skin Analysis Prompts (`supabase/functions/analyze-skin/index.ts`)
 
-## The Fix
-Drop the saturation and lightness on all dark surfaces to get back to a true black foundation while keeping the clinical-luxury accent colors.
+### Core Problems
 
-### CSS Variable Changes (src/index.css)
+- Update the system prompt to require plain, conversational language for problem descriptions
+- Use analogies and "your skin" phrasing
+- If a technical term appears, follow it with a parenthetical plain-English explanation, 
+- overall still a well versed in depth explation, but not just blobs and blocks of tehcinal jargon with no explantion. The user should feel like talking to a smart friend bsaically, not a block of tecinial jargon
 
-| Token | Current | New | Why |
-|-------|---------|-----|-----|
-| --background | 220 15% 7% | 220 10% 4% | Near-black with minimal blue tint |
-| --card | 220 14% 11% | 220 10% 7% | Darker cards, still distinguishable |
-| --popover | 220 14% 11% | 220 10% 7% | Match card darkness |
-| --muted | 220 12% 16% | 220 10% 12% | Darker muted surfaces |
-| --input | 220 12% 16% | 220 10% 12% | Match muted |
-| --border | 220 12% 20% | 220 10% 15% | Subtler borders |
-| --obsidian | 220 15% 7% | 220 10% 4% | Match background |
-| --obsidian-light | 220 14% 11% | 220 10% 7% | Match card |
-| --glass-border | 220 12% 25% | 220 10% 18% | Subtler glass edges |
-| --sidebar-background | 220 15% 9% | 220 10% 5% | Darker sidebar |
-| --sidebar-accent | 220 12% 16% | 220 10% 12% | Match muted |
-| --sidebar-border | 220 12% 20% | 220 10% 15% | Match border |
+### Deep Analysis
 
-### Body Gradient
-Update from `hsl(220, 15%, 8%) to hsl(220, 15%, 5%)` to `hsl(220, 10%, 4%) to hsl(220, 10%, 2%)` for a near-pure-black base.
+- Keep it high-level and clinical -- technical terms are welcome here
+- But every technical/medical term MUST be immediately followed by a parenthetical explanation
+- Example style: "Your transepidermal water loss (the rate moisture escapes through your skin) is elevated, indicating compromised lipid lamellae (the protective fat layers between skin cells)."
+- &nbsp;
 
-### Glassmorphism Card
-Update `.glass-card` background from `hsla(220, 14%, 13%, 0.6)` to `hsla(220, 10%, 8%, 0.6)` and the border from `hsla(220, 12%, 28%, 0.3)` to `hsla(220, 10%, 20%, 0.3)`.
+---
 
-### Files to Edit
-- `src/index.css` (only file affected -- all changes are CSS variable updates)
+## 2. AI Coach Prompts (`supabase/functions/ai-coach-chat/index.ts`)
 
-### What Stays the Same
-- All accent colors (teal, rose-gold, lavender)
-- All component layouts and logic
-- Glow/animation effects (they'll actually pop more against true black)
+### Formatting
 
+- Short paragraphs (2-3 sentences max each)
+- Use bullet points and line breaks -- never walls of text
+- Max 3-4 short paragraphs or intro + bullet list
+
+### Tone
+
+- Conversational and warm, like a knowledgeable best friend
+- Use "your" and "you" frequently
+
+### Personalization Callouts
+
+- Frequently reference the user's actual scan data with phrases like:
+  - "Based on your scan, I noticed..."
+  - "Since your skin scored X/10..."
+  - "This isn't generic advice -- I'm pulling from your actual skin data"
+  - "Your scan flagged [concern], so specifically for you..."
+- This emphasizes the coach is data-driven, not giving random tips
+
+### Accessibility
+
+- Still expert-level advice, just delivered casually
+- Use analogies when explaining why something works
+
+---
+
+## What Stays the Same
+
+- No frontend/UI changes needed
+- Science accuracy unchanged
+- Premium vs free logic untouched
+- All other prompt sections (ingredients, routine, scoring) unchanged
