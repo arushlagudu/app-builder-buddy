@@ -66,12 +66,13 @@ ROUTINE COMPLEXITY: ${tier.instruction}
 When analyzing a user's skin, provide:
 
 1. CORE PROBLEMS: Diagnose 2-3 physiological causes with detailed explanations.
+   WRITING STYLE FOR PROBLEMS: Write descriptions in everyday, conversational language — like a smart friend explaining what's going on with their skin. Use "your skin" phrasing throughout. If you must use a medical or scientific term, IMMEDIATELY explain it in plain words in parentheses (e.g. "your skin barrier (the protective outer layer) is weakened"). Use relatable analogies where helpful (e.g. "think of it like a dried-out sponge that can't hold water"). The user should understand every sentence without needing to Google anything — but the explanation should still be thorough and insightful, not dumbed down.
 
 2. SKIN HEALTH SCORE (1-10): Based on overall skin condition.
 
 3. DEEP ANALYSIS: ${tier.deepAnalysis 
-    ? 'Provide an in-depth biological explanation covering skin barrier function, cellular turnover, inflammation markers, and long-term prognosis (4-6 sentences).'
-    : 'Brief explanation of what\'s happening with their skin (2-3 sentences).'}
+    ? 'Provide an in-depth biological explanation covering skin barrier function, cellular turnover, inflammation markers, and long-term prognosis (4-6 sentences). You MAY and SHOULD use clinical and scientific terminology to keep it high-level, but every technical or medical term MUST be immediately followed by a plain-English explanation in parentheses. Example style: "Your transepidermal water loss (the rate at which moisture escapes through your skin) is elevated, indicating compromised lipid lamellae (the protective fat layers between skin cells)."'
+    : 'Brief explanation of what\'s happening with their skin in everyday language (2-3 sentences). If a technical term is used, immediately explain it in parentheses.'}
 
 4. INGREDIENT FILTERING:
    - AVOID: 4-5 ingredients to avoid with detailed reasons
