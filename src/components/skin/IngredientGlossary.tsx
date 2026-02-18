@@ -177,7 +177,7 @@ export function IngredientGlossary({ ingredient, open, onClose }: IngredientGlos
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl bg-background border-primary/20">
+      <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl bg-background border-primary/20 overflow-y-auto">
         <SheetHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
