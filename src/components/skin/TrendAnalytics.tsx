@@ -29,6 +29,7 @@ export function TrendAnalytics() {
       const { data: records, error } = await supabase
         .from('analysis_history')
         .select('id, created_at, score, problems')
+        .eq('user_id', user!.id)
         .order('created_at', { ascending: true });
 
       if (error) throw error;

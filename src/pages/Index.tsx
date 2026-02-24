@@ -155,6 +155,7 @@ export default function Index() {
         avoid_ingredients: analysisData.avoidIngredients,
         prescription_ingredients: analysisData.prescriptionIngredients,
         routine: analysisData.routine,
+        image_url: imageData,
       });
 
       if (error) throw error;

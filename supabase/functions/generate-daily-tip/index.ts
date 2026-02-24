@@ -24,7 +24,7 @@ serve(async (req) => {
     // Get user's latest analysis for personalization
     const { data: analysis } = await supabaseClient
       .from("analysis_history")
-      .select("skin_type, concerns, score, problems")
+      .select("skin_type, concerns, score, problems, avoid_ingredients, prescription_ingredients, climate, pollution")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -33,9 +33,16 @@ serve(async (req) => {
     let prompt: string;
 
     if (analysis) {
+      const avoidNames = (analysis.avoid_ingredients as any[])?.map((i: any) => i.name).join(', ') || '';
+      const rxNames = (analysis.prescription_ingredients as any[])?.map((i: any) => i.name).join(', ') || '';
+      
       prompt = `Generate a short, actionable daily skincare tip for someone with ${analysis.skin_type || 'normal'} skin${
         analysis.concerns?.length ? ` concerned about ${analysis.concerns.join(', ')}` : ''
-      }${analysis.score ? ` with a skin health score of ${analysis.score}/10` : ''}. 
+      }${analysis.score ? ` with a skin health score of ${analysis.score}/10` : ''}${
+        analysis.climate ? ` living in a ${analysis.climate} climate` : ''
+      }${avoidNames ? `. They should AVOID these ingredients: ${avoidNames}` : ''}${
+        rxNames ? `. Recommended ingredients for them: ${rxNames}` : ''
+      }. 
       
       Return JSON with "title" (max 8 words, catchy) and "content" (max 2 sentences, specific and actionable). No markdown.`;
     } else {
