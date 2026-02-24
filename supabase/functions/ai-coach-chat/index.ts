@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { message, skinType, concerns, score, problems, avoidIngredients, prescriptionIngredients, chatHistory } = body;
+    const { message, skinType, concerns, climate, score, previousScore, problems, avoidIngredients, prescriptionIngredients, chatHistory } = body;
     
     console.log("Received chat message:", message?.substring(0, 50));
     
@@ -32,7 +32,7 @@ serve(async (req) => {
     }
 
     // Build context from user's skin data
-    const skinContext = buildSkinContext({ skinType, concerns, score, problems, avoidIngredients, prescriptionIngredients });
+    const skinContext = buildSkinContext({ skinType, concerns, climate, score, previousScore, problems, avoidIngredients, prescriptionIngredients });
 
     const systemPrompt = `You are an expert AI Skin Coach — think of yourself as a knowledgeable best friend who happens to know a LOT about skincare. You provide personalized advice based on the user's actual skin scan data.
 
@@ -143,10 +143,12 @@ OTHER:
   }
 });
 
-function buildSkinContext({ skinType, concerns, score, problems, avoidIngredients, prescriptionIngredients }: {
+function buildSkinContext({ skinType, concerns, climate, score, previousScore, problems, avoidIngredients, prescriptionIngredients }: {
   skinType?: string;
   concerns?: string[];
+  climate?: string;
   score?: number;
+  previousScore?: number;
   problems?: Array<{ title: string; description: string }>;
   avoidIngredients?: Array<{ name: string; reason: string }>;
   prescriptionIngredients?: Array<{ name: string; reason: string }>;
@@ -159,10 +161,19 @@ function buildSkinContext({ skinType, concerns, score, problems, avoidIngredient
 
   if (score !== undefined && score !== null) {
     parts.push(`- Current Skin Health Score: ${score}/10`);
+    if (previousScore !== undefined && previousScore !== null) {
+      const diff = score - previousScore;
+      const direction = diff >= 0 ? 'improved' : 'declined';
+      parts.push(`- Previous Score: ${previousScore}/10 — Score ${direction} by ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}`);
+    }
   }
 
   if (concerns && concerns.length > 0) {
     parts.push(`- Primary Concerns: ${concerns.join(", ")}`);
+  }
+
+  if (climate) {
+    parts.push(`- Climate/Environment: ${climate}`);
   }
 
   if (problems && problems.length > 0) {
