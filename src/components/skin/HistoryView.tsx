@@ -33,6 +33,7 @@ export function HistoryView({ onSelectAnalysis }: HistoryViewProps) {
       const { data, error } = await supabase
         .from('analysis_history')
         .select('id, created_at, score, skin_type, problems')
+        .eq('user_id', user!.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;

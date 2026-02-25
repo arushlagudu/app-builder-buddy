@@ -1,10 +1,12 @@
 import { Flame, Sun, Moon, Trophy, Target, Check } from 'lucide-react';
 import { useStreaks } from '@/hooks/useStreaks';
+import { useAchievements } from '@/hooks/useAchievements';
 import { useAuth } from '@/hooks/useAuth';
 
 export function StreakTracker() {
   const { user } = useAuth();
   const { stats, todayStatus, loading, markComplete, getStreakBadge } = useStreaks();
+  const { checkAndUnlock } = useAchievements();
   const badge = getStreakBadge();
 
   if (!user) {
@@ -60,7 +62,12 @@ export function StreakTracker() {
         <div className="grid grid-cols-2 gap-3">
           {/* Morning Button */}
           <button
-            onClick={() => !todayStatus.morning && markComplete('morning')}
+            onClick={async () => {
+              if (!todayStatus.morning) {
+                await markComplete('morning');
+                checkAndUnlock(stats.currentStreak);
+              }
+            }}
             disabled={todayStatus.morning}
             className={`p-4 rounded-xl border-2 transition-all ${
               todayStatus.morning
@@ -85,7 +92,12 @@ export function StreakTracker() {
 
           {/* Evening Button */}
           <button
-            onClick={() => !todayStatus.evening && markComplete('evening')}
+            onClick={async () => {
+              if (!todayStatus.evening) {
+                await markComplete('evening');
+                checkAndUnlock(stats.currentStreak);
+              }
+            }}
             disabled={todayStatus.evening}
             className={`p-4 rounded-xl border-2 transition-all ${
               todayStatus.evening

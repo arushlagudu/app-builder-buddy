@@ -124,7 +124,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { intensity, chemicalPreference, skinType, concerns, problems, score, previousScore, climate, pollution } = body;
+    const { intensity, chemicalPreference, skinType, concerns, problems, score, previousScore, climate, pollution, avoidIngredients, prescriptionIngredients } = body;
     
     console.log("Generating routine with intensity:", intensity, "chemical:", chemicalPreference, "skinType:", skinType);
     
@@ -175,6 +175,8 @@ USER PROFILE:
 ${previousScore !== undefined ? `- Previous Skin Health Score: ${previousScore}/10` : ''}
 - Climate: ${climate || 'temperate'}
 - Pollution Level: ${pollution || 'moderate'}
+${avoidIngredients?.length ? `\nMUST AVOID these ingredients (do NOT recommend products containing these): ${avoidIngredients.map((i: any) => `${i.name} (${i.reason})`).join(", ")}` : ''}
+${prescriptionIngredients?.length ? `\nRECOMMENDED ingredients to include when possible: ${prescriptionIngredients.map((i: any) => `${i.name} (${i.reason})`).join(", ")}` : ''}
 ${progressContext}
 
 Create a complete routine matching the ${intensity.toUpperCase()} intensity level with ${chemicalPreference?.toUpperCase() || 'BALANCED'} ingredient preferences. Include specific product recommendations, application instructions, and scientific rationales. Include weekly treatments if appropriate for the intensity level.

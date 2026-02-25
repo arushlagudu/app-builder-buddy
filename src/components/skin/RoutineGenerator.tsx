@@ -39,6 +39,8 @@ interface RoutineGeneratorProps {
   climate: string;
   pollution: string;
   previousScore?: number;
+  avoidIngredients?: Array<{ name: string; reason: string }>;
+  prescriptionIngredients?: Array<{ name: string; reason: string }>;
 }
 
 type Intensity = 'simple' | 'medium' | 'intense';
@@ -104,7 +106,7 @@ const chemicalConfig = {
   },
 };
 
-export function RoutineGenerator({ skinType, concerns, problems, score, climate, pollution, previousScore }: RoutineGeneratorProps) {
+export function RoutineGenerator({ skinType, concerns, problems, score, climate, pollution, previousScore, avoidIngredients, prescriptionIngredients }: RoutineGeneratorProps) {
   const [selectedIntensity, setSelectedIntensity] = useState<Intensity | null>(null);
   const [selectedChemical, setSelectedChemical] = useState<ChemicalPreference>('balanced');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -158,6 +160,8 @@ export function RoutineGenerator({ skinType, concerns, problems, score, climate,
           previousScore,
           climate,
           pollution,
+          avoidIngredients,
+          prescriptionIngredients,
         }),
       });
 
