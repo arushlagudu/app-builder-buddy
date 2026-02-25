@@ -1,63 +1,67 @@
 
 
-# Fix Data Flow, Progress Analytics, and AI Data Optimization
+# Remaining Bugs and Optimization Fixes
 
-There are several concrete bugs and gaps causing data to not flow correctly across features. Here's what's broken and the fix for each.
-
----
-
-## Issues Found
-
-### 1. Scan images never saved to analysis history
-When a scan completes, the `image_url` field is never included in the database insert. The `imageData` (base64 photo) exists in state but is skipped when saving to `analysis_history`. This means progress photos, history views, and any feature trying to show the scan image will have nothing to display.
-
-### 2. TrendAnalytics doesn't filter by user
-The `TrendAnalytics` component queries `analysis_history` without filtering by `user_id`, which means RLS is the only protection but may cause unexpected empty results or errors.
-
-### 3. AI Coach doesn't receive climate data
-The AI Coach edge function receives skin type, concerns, score, problems, and ingredients -- but `climate` is passed as a prop to the component and never sent in the API request body. The `buildSkinContext` function also doesn't include it.
-
-### 4. Daily tip generator has limited context
-The `generate-daily-tip` function only pulls `skin_type`, `concerns`, `score`, and `problems` from the latest analysis. It doesn't include `avoid_ingredients`, `prescription_ingredients`, or `climate` -- meaning tips aren't as personalized as they could be.
+After a thorough audit of the codebase, here are all the remaining issues holding the app back from its full potential.
 
 ---
 
-## Plan
+## Bug 1: HistoryView doesn't filter by user_id
 
-### Fix 1: Save image_url when saving analysis to history
-**File:** `src/pages/Index.tsx` -- `saveAnalysisToHistory` function
+**Problem:** `src/components/skin/HistoryView.tsx` queries `analysis_history` without `.eq('user_id', user.id)`. While RLS protects the data, this is inconsistent with other components (TrendAnalytics was just fixed) and can cause silent failures.
 
-Add `image_url: imageData` to the `analysis_history` insert call so the user's scan photo is stored alongside results.
+**Fix:** Add `.eq('user_id', user.id)` to the `fetchHistory` query (line 33-36).
 
-### Fix 2: Add user_id filter to TrendAnalytics
-**File:** `src/components/skin/TrendAnalytics.tsx`
+---
 
-Add `.eq('user_id', user.id)` to the `fetchAnalytics` query so it explicitly filters by the current user.
+## Bug 2: ProgressTimeline doesn't filter by user_id
 
-### Fix 3: Pass climate to AI Coach API call
-**File:** `src/components/skin/AISkinCoach.tsx`
+**Problem:** `src/components/skin/ProgressTimeline.tsx` queries `progress_photos` without `.eq('user_id', user.id)` (line 34-37). Same issue as above.
 
-Add `climate` to the request body sent to the `ai-coach-chat` edge function.
+**Fix:** Add `.eq('user_id', user.id)` to the `fetchPhotos` query.
 
-**File:** `supabase/functions/ai-coach-chat/index.ts`
+---
 
-- Extract `climate` from the request body
-- Pass it to `buildSkinContext`
-- Add climate info to the context string (e.g., "Climate: tropical")
+## Bug 3: Progress photos never linked to scan scores
 
-### Fix 4: Enrich daily tip generator with full analysis data
-**File:** `supabase/functions/generate-daily-tip/index.ts`
+**Problem:** When a scan completes and saves to `analysis_history`, no corresponding `progress_photo` is created. The `progress_photos` table has a `skin_score` and `analysis_id` column, but they're never populated from scan results. This means the Progress Timeline always shows photos with no score, and the score trend in that view is always null.
 
-Expand the `select` query to also fetch `avoid_ingredients`, `prescription_ingredients`, `climate`, and `pollution`. Include these in the AI prompt so tips are more personalized.
+**Fix:** After saving analysis to history in `src/pages/Index.tsx`, also insert a record into `progress_photos` with the scan image, score, and analysis ID. This bridges the gap between scan results and the progress timeline.
 
-### Fix 5: Pass previousScore to AI Coach context
-**File:** `supabase/functions/ai-coach-chat/index.ts`
+---
 
-Accept `previousScore` from the request body and add it to the skin context (e.g., "Previous Score: 6.2/10 -- Score improved by +1.3"). This lets the coach reference progress.
+## Bug 4: Streaks and Achievements are disconnected
 
-**File:** `src/components/skin/AISkinCoach.tsx`
+**Problem:** The `useAchievements` hook has a `checkAndUnlock` function, but it's never called anywhere. Users can build streaks but achievements are never actually checked/unlocked.
 
-Add `previousScore` to the API request body (it's already a prop but not sent).
+**Fix:** In `src/components/skin/StreakTracker.tsx`, after a successful `markComplete`, call `checkAndUnlock(stats.currentStreak)` from the achievements hook.
+
+---
+
+## Bug 5: AI Coach doesn't send avoidIngredients and prescriptionIngredients data correctly
+
+**Problem:** In `AISkinCoach.tsx`, `avoidIngredients` and `prescriptionIngredients` are sent in the API body, but the AI coach edge function already receives them. However, the `climate` field was just fixed. Looking deeper, the edge function's `buildSkinContext` includes ingredient names but not reasons -- which means the AI coach can say "avoid X" but can't explain why without the reason data.
+
+**Fix:** Update `buildSkinContext` in `supabase/functions/ai-coach-chat/index.ts` to include both the ingredient name AND reason (e.g., "Retinol (can cause irritation with sensitive skin)").
+
+---
+
+## Bug 6: RoutineGenerator doesn't pass avoidIngredients to the edge function
+
+**Problem:** The `generate-routine` edge function builds a user profile prompt but never receives or uses the user's `avoidIngredients` or `prescriptionIngredients`. This means generated routines could recommend products containing ingredients the user should avoid.
+
+**Fix:** 
+- In `src/components/skin/RoutineGenerator.tsx`, add `avoidIngredients` and `prescriptionIngredients` props and pass them in the API request body.
+- In `supabase/functions/generate-routine/index.ts`, extract these from the request and include them in the user prompt (e.g., "MUST AVOID these ingredients: ...").
+- Update the parent in `Index.tsx` to pass these props to `RoutineGenerator`.
+
+---
+
+## Bug 7: Share card says "Dermatologist Certified" -- misleading
+
+**Problem:** `ShareScoreCard.tsx` line 119 renders "Dermatologist Certified" on generated share images. This is not accurate and could be legally problematic.
+
+**Fix:** Change to "AI-Powered Analysis" or "Powered by SKYN AI".
 
 ---
 
@@ -65,9 +69,12 @@ Add `previousScore` to the API request body (it's already a prop but not sent).
 
 | File | Change |
 |------|--------|
-| `src/pages/Index.tsx` | Add `image_url: imageData` to analysis insert |
-| `src/components/skin/TrendAnalytics.tsx` | Add `.eq('user_id', user.id)` to query |
-| `src/components/skin/AISkinCoach.tsx` | Add `climate` and `previousScore` to API request body |
-| `supabase/functions/ai-coach-chat/index.ts` | Accept + use `climate` and `previousScore` in context |
-| `supabase/functions/generate-daily-tip/index.ts` | Fetch and use full analysis data in prompt |
+| `src/components/skin/HistoryView.tsx` | Add `.eq('user_id', user.id)` to query |
+| `src/components/skin/ProgressTimeline.tsx` | Add `.eq('user_id', user.id)` to query |
+| `src/pages/Index.tsx` | Auto-save progress photo after scan with score + analysis_id |
+| `src/components/skin/StreakTracker.tsx` | Call `checkAndUnlock` after marking routine complete |
+| `supabase/functions/ai-coach-chat/index.ts` | Include ingredient reasons in context |
+| `src/components/skin/RoutineGenerator.tsx` | Accept + send avoidIngredients/prescriptionIngredients |
+| `supabase/functions/generate-routine/index.ts` | Use avoid/prescription ingredients in prompt |
+| `src/components/skin/ShareScoreCard.tsx` | Fix misleading "Dermatologist Certified" text |
 
