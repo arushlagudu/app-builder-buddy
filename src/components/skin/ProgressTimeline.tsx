@@ -34,6 +34,7 @@ export function ProgressTimeline() {
       const { data, error } = await supabase
         .from('progress_photos')
         .select('*')
+        .eq('user_id', user!.id)
         .order('created_at', { ascending: true });
 
       if (error) throw error;

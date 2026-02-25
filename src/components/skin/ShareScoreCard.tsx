@@ -116,7 +116,7 @@ export function ShareScoreCard({ score, skinType, concerns }: ShareScoreCardProp
       // Dermatologist certified badge
       ctx.font = '12px system-ui';
       ctx.fillStyle = '#4ADE80';
-      ctx.fillText('✓ Dermatologist Certified', 300, 750);
+      ctx.fillText('✓ Powered by SKYN AI', 300, 750);
 
       const blob = await new Promise<Blob>((resolve) => {
         canvas.toBlob((b) => resolve(b!), 'image/png');

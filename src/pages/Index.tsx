@@ -160,6 +160,30 @@ export default function Index() {
 
       if (error) throw error;
 
+      // Also save a progress photo linked to this analysis
+      try {
+        // Get the analysis ID we just inserted
+        const { data: latestRow } = await supabase
+          .from('analysis_history')
+          .select('id')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (latestRow && imageData) {
+          await supabase.from('progress_photos').insert({
+            user_id: user.id,
+            image_url: imageData,
+            skin_score: analysisData.score,
+            analysis_id: latestRow.id,
+            notes: `Auto-captured from ${formData?.analysisTier || 'basic'} scan`,
+          });
+        }
+      } catch (progressErr) {
+        console.error('Failed to save progress photo:', progressErr);
+      }
+
       // Also save the basic routine to generated_routines for the Routines tab
       const amSteps = analysisData.routine.filter(s => s.time === 'AM' || s.time === 'BOTH');
       const pmSteps = analysisData.routine.filter(s => s.time === 'PM' || s.time === 'BOTH');

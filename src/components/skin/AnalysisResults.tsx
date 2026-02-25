@@ -204,6 +204,8 @@ export function AnalysisResults({ data, skinType, concerns, climate, pollution, 
           score={data.score}
           climate={climate || 'temperate'}
           pollution={pollution || 'moderate'}
+          avoidIngredients={data.avoidIngredients}
+          prescriptionIngredients={data.prescriptionIngredients}
         />
       ) : (
         /* Premium Upsell for Routine */

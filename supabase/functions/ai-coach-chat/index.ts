@@ -181,11 +181,11 @@ function buildSkinContext({ skinType, concerns, climate, score, previousScore, p
   }
 
   if (avoidIngredients && avoidIngredients.length > 0) {
-    parts.push(`- Ingredients to AVOID: ${avoidIngredients.map(i => i.name).join(", ")}`);
+    parts.push(`- Ingredients to AVOID: ${avoidIngredients.map(i => `${i.name} (${i.reason})`).join(", ")}`);
   }
 
   if (prescriptionIngredients && prescriptionIngredients.length > 0) {
-    parts.push(`- Recommended Ingredients: ${prescriptionIngredients.map(i => i.name).join(", ")}`);
+    parts.push(`- Recommended Ingredients: ${prescriptionIngredients.map(i => `${i.name} (${i.reason})`).join(", ")}`);
   }
 
   if (parts.length === 1) {
