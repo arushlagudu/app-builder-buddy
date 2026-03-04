@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Camera, Upload, X, Scan, AlertTriangle, Check, Loader2, Package, Info, RefreshCw, AlertCircle } from 'lucide-react';
+import { Camera, Upload, X, Scan, AlertTriangle, Check, Loader2, Package, Info, RefreshCw, AlertCircle, ShieldCheck, AlertOctagon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -201,6 +201,48 @@ export function ProductScanner({ skinType, concerns, score, problems, avoidIngre
           </div>
         </div>
       </div>
+
+      {/* Skin Profile Cross-Reference Banner */}
+      {skinType && score ? (
+        <div className="glass-card p-3 bg-green-500/10 border-green-500/20">
+          <div className="flex items-start gap-2">
+            <ShieldCheck className="w-4 h-4 text-green-400 mt-0.5 shrink-0" />
+            <div className="text-xs space-y-1.5">
+              <p className="font-medium text-green-400">Personalized for your skin</p>
+              <p className="text-muted-foreground">
+                Your face scan results are being cross-referenced to check ingredient compatibility
+              </p>
+              <div className="flex flex-wrap gap-2 mt-1">
+                <span className="px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 text-[10px] font-medium">
+                  {skinType} skin
+                </span>
+                {concerns && concerns.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 text-[10px] font-medium">
+                    {concerns.length} concern{concerns.length !== 1 ? 's' : ''}
+                  </span>
+                )}
+                {((avoidIngredients?.length || 0) + (prescriptionIngredients?.length || 0)) > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 text-[10px] font-medium">
+                    {(avoidIngredients?.length || 0) + (prescriptionIngredients?.length || 0)} ingredients monitored
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="glass-card p-3 bg-yellow-500/10 border-yellow-500/20">
+          <div className="flex items-start gap-2">
+            <AlertOctagon className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
+            <div className="text-xs space-y-1">
+              <p className="font-medium text-yellow-400">Complete a face scan first</p>
+              <p className="text-muted-foreground">
+                Get a personalized analysis by scanning your face first — we'll cross-reference ingredients against your skin profile
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Blur Warning */}
       {showBlurWarning && (
