@@ -29,7 +29,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { LatestAnalysis, PreviousAnalysis } from '@/hooks/useLatestAnalysis';
 import type { User } from '@supabase/supabase-js';
 
-interface SkynLandingProps {
+interface PurelyLandingProps {
   onStartTutorial: () => void;
   onGoToScan: () => void;
   hasCompletedScan: boolean;
@@ -300,7 +300,7 @@ function SkinStatusCard({ latestAnalysis, previousAnalysis, onGoToScan
 
 }
 
-export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan, onUpgrade, latestAnalysis, previousAnalysis, user, onGoToCoach }: SkynLandingProps) {
+export function PurelyLanding({ onStartTutorial, onGoToScan, hasCompletedScan, onUpgrade, latestAnalysis, previousAnalysis, user, onGoToCoach }: PurelyLandingProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -315,7 +315,7 @@ export function SkynLanding({ onStartTutorial, onGoToScan, hasCompletedScan, onU
           </div>
           
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">SKYN</span>
+            Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Purely</span>
           </h1>
           
           <p className="text-muted-foreground max-w-sm mx-auto">

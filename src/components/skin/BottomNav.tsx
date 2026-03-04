@@ -13,15 +13,15 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
     { id: 'scan' as Tab, icon: Scan, label: 'Scan' },
     { id: 'routines' as Tab, icon: ListChecks, label: 'Routines' },
     { id: 'scanner' as Tab, icon: Package, label: 'Scanner' },
-    { id: 'skyn' as Tab, icon: Dna, label: 'SKYN' },
+    { id: 'skyn' as Tab, icon: Dna, label: 'Purely' },
     { id: 'coach' as Tab, icon: Bot, label: 'AI Coach' },
     { id: 'progress' as Tab, icon: TrendingUp, label: 'Progress Analytics' },
     { id: 'settings' as Tab, icon: Settings, label: 'Settings' },
   ];
 
-  // Split tabs into left, center (SKYN), and right groups (3-1-3 for balance)
+  // Split tabs into left, center (Purely), and right groups (3-1-3 for balance)
   const leftTabs = tabs.slice(0, 3);
-  const centerTab = tabs[3]; // SKYN
+  const centerTab = tabs[3]; // Purely
   const rightTabs = tabs.slice(4);
 
   return (
@@ -46,7 +46,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             ))}
           </div>
 
-          {/* Center SKYN tab - subtle prominence */}
+          {/* Center Purely tab - subtle prominence */}
           <button
             onClick={() => onTabChange(centerTab.id)}
             className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-300 ${
