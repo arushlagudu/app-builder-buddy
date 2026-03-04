@@ -55,7 +55,7 @@ export function ShareScoreCard({ score, skinType, concerns }: ShareScoreCardProp
       ctx.font = 'bold 36px system-ui';
       ctx.fillStyle = '#00F5FF';
       ctx.textAlign = 'center';
-      ctx.fillText('SKYN', 300, 80);
+      ctx.fillText('Purely', 300, 80);
 
       ctx.font = '14px system-ui';
       ctx.fillStyle = '#888888';
@@ -116,24 +116,24 @@ export function ShareScoreCard({ score, skinType, concerns }: ShareScoreCardProp
       // Dermatologist certified badge
       ctx.font = '12px system-ui';
       ctx.fillStyle = '#4ADE80';
-      ctx.fillText('✓ Powered by SKYN AI', 300, 750);
+      ctx.fillText('✓ Powered by Purely AI', 300, 750);
 
       const blob = await new Promise<Blob>((resolve) => {
         canvas.toBlob((b) => resolve(b!), 'image/png');
       });
 
-      if (navigator.share && navigator.canShare?.({ files: [new File([blob], 'skyn-score.png', { type: 'image/png' })] })) {
+      if (navigator.share && navigator.canShare?.({ files: [new File([blob], 'purely-score.png', { type: 'image/png' })] })) {
         await navigator.share({
-          title: `My SKYN Score: ${score}/10`,
+          title: `My Purely Score: ${score}/10`,
           text: `I just got my AI skin health score! ${getScoreLabel()} — ${score}/10. Get yours free at yourskyn.lovable.app`,
-          files: [new File([blob], 'skyn-score.png', { type: 'image/png' })],
+          files: [new File([blob], 'purely-score.png', { type: 'image/png' })],
         });
       } else {
         // Fallback: download
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'skyn-score.png';
+        a.download = 'purely-score.png';
         a.click();
         URL.revokeObjectURL(url);
         toast.success('Score card downloaded! Share it on social media 🎉');
